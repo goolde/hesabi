@@ -1,0 +1,3890 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>حسابي – إدارة مالية ذكية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg:#0a0f1e; --bg2:#0f1628; --bg3:#151d35; --bg4:#1a2340;
+  --card:#111827; --card2:#1f2937;
+  --border:rgba(99,179,237,0.15); --border2:rgba(99,179,237,0.08);
+  --gold:#f6c90e; --gold2:#d4a017; --gold3:rgba(246,201,14,0.12);
+  --blue:#63b3ed; --blue2:#3182ce; --blue3:rgba(99,179,237,0.12);
+  --green:#48bb78; --green2:rgba(72,187,120,0.15);
+  --red:#fc8181; --red2:rgba(252,129,129,0.15);
+  --purple:#b794f4; --purple2:rgba(183,148,244,0.15);
+  --orange:#f6ad55; --orange2:rgba(246,173,85,0.15);
+  --text:#e2e8f0; --text2:#a0aec0; --text3:#718096;
+  --r:16px; --r2:12px; --r3:8px;
+  --shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 15% 10%,rgba(99,179,237,0.07) 0%,transparent 55%),radial-gradient(ellipse 60% 40% at 85% 85%,rgba(246,201,14,0.05) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;position:relative;z-index:1;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* SPLASH */
+#splash{align-items:center;justify-content:center;background:linear-gradient(135deg,#060c1a,#0d1830,#060c1a);}
+.splash-wrap{text-align:center;}
+.splash-icon{width:110px;height:110px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:30px;display:flex;align-items:center;justify-content:center;font-size:52px;margin:0 auto 22px;box-shadow:0 0 60px rgba(246,201,14,0.5),0 0 120px rgba(246,201,14,0.2);animation:iconPulse 2s infinite;}
+@keyframes iconPulse{0%,100%{box-shadow:0 0 60px rgba(246,201,14,0.5),0 0 120px rgba(246,201,14,0.2)}50%{box-shadow:0 0 80px rgba(246,201,14,0.7),0 0 150px rgba(246,201,14,0.3)}}
+.splash-title{font-size:48px;font-weight:900;color:var(--gold);letter-spacing:-2px;}
+.splash-sub{color:var(--text2);font-size:15px;margin-top:6px;}
+.splash-bar{width:220px;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;margin:32px auto 0;overflow:hidden;}
+.splash-fill{height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:2px;animation:fillBar 2.2s ease forwards;}
+@keyframes fillBar{from{width:0}to{width:100%}}
+
+/* LOGIN */
+#login{align-items:center;justify-content:center;padding:20px;}
+.login-box{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px 28px;box-shadow:var(--shadow),0 0 80px rgba(99,179,237,0.04);animation:slideUp 0.4s ease;}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+.l-logo{text-align:center;margin-bottom:28px;}
+.l-icon{width:68px;height:68px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 14px;box-shadow:0 0 30px rgba(246,201,14,0.3);}
+.l-logo h1{font-size:26px;font-weight:900;color:var(--gold);}
+.l-logo p{color:var(--text2);font-size:13px;margin-top:3px;}
+.l-tabs{display:flex;gap:6px;background:var(--bg3);border-radius:var(--r2);padding:4px;margin-bottom:22px;}
+.l-tab{flex:1;padding:10px;text-align:center;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;color:var(--text3);border:none;background:none;font-family:'Cairo',sans-serif;}
+.l-tab.active{background:var(--gold);color:#000;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;color:var(--text2);margin-bottom:7px;font-weight:600;}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r3);color:var(--text);font-size:14px;font-family:'Cairo',sans-serif;transition:all 0.2s;outline:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold3);}
+.field select option{background:var(--bg3);}
+.btn{width:100%;padding:13px;border:none;border-radius:var(--r2);font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;transition:all 0.2s;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(246,201,14,0.3);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2);}
+.otp-row{display:flex;gap:10px;justify-content:center;margin-bottom:14px;}
+.otp-input{width:52px;height:56px;text-align:center;font-size:22px;font-weight:700;background:var(--bg3);border:2px solid var(--border2);border-radius:var(--r2);color:var(--text);font-family:'Cairo',sans-serif;outline:none;transition:all 0.2s;}
+.otp-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold3);}
+.l-forgot{text-align:center;margin-top:14px;font-size:13px;color:var(--blue);cursor:pointer;}
+.l-switch{text-align:center;margin-top:18px;font-size:13px;color:var(--text2);}
+.l-switch span{color:var(--gold);cursor:pointer;font-weight:600;}
+
+/* HEADER */
+.header{background:var(--card);border-bottom:1px solid var(--border2);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);}
+.header-logo{display:flex;align-items:center;gap:10px;}
+.header-logo .ico{width:38px;height:38px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.header-logo span{font-size:18px;font-weight:900;color:var(--gold);}
+.header-actions{display:flex;gap:8px;align-items:center;}
+.icon-btn{width:38px;height:38px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all 0.2s;position:relative;}
+.icon-btn:hover{border-color:var(--gold);background:var(--gold3);}
+.notif-badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:var(--red);border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff;}
+.avatar{width:38px;height:38px;background:linear-gradient(135deg,var(--blue2),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;cursor:pointer;border:2px solid var(--border);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border2);display:flex;z-index:100;padding:8px 0 calc(8px + env(safe-area-inset-bottom));backdrop-filter:blur(20px);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;cursor:pointer;transition:all 0.2s;border:none;background:none;}
+.nav-item .nav-icon{font-size:22px;transition:all 0.2s;}
+.nav-item .nav-label{font-size:10px;color:var(--text3);font-family:'Cairo',sans-serif;font-weight:600;transition:all 0.2s;}
+.nav-item.active .nav-icon{transform:scale(1.1);}
+.nav-item.active .nav-label{color:var(--gold);}
+.nav-item.active{position:relative;}
+.nav-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:32px;height:2px;background:var(--gold);border-radius:0 0 4px 4px;}
+
+/* PAGE CONTENT */
+.page-content{flex:1;padding:20px 16px 90px;overflow-y:auto;}
+.page-title{font-size:22px;font-weight:900;margin-bottom:18px;}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:18px;}
+.card2{background:var(--card2);border:1px solid var(--border2);border-radius:var(--r2);padding:14px;}
+
+/* DASHBOARD */
+.balance-card{background:linear-gradient(135deg,#1a2340,#0f1a30);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden;}
+.balance-card::before{content:'';position:absolute;top:-30px;left:-30px;width:200px;height:200px;background:radial-gradient(circle,rgba(246,201,14,0.08) 0%,transparent 70%);pointer-events:none;}
+.balance-label{font-size:13px;color:var(--text2);margin-bottom:8px;}
+.balance-amount{font-size:38px;font-weight:900;line-height:1;}
+.balance-amount.positive{color:var(--green);}
+.balance-amount.negative{color:var(--red);}
+.balance-amount.zero{color:var(--text2);}
+.balance-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}
+.bal-mini{background:rgba(255,255,255,0.04);border-radius:var(--r2);padding:12px;}
+.bal-mini-label{font-size:11px;color:var(--text3);margin-bottom:4px;}
+.bal-mini-val{font-size:18px;font-weight:700;}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:16px;cursor:pointer;transition:all 0.2s;}
+.stat-card:hover{border-color:var(--border);transform:translateY(-2px);}
+.stat-icon{font-size:26px;margin-bottom:8px;}
+.stat-val{font-size:20px;font-weight:800;}
+.stat-label{font-size:11px;color:var(--text2);margin-top:3px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.section-title{font-size:16px;font-weight:700;}
+.see-all{font-size:12px;color:var(--blue);cursor:pointer;}
+.activity-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border2);}
+.activity-item:last-child{border-bottom:none;}
+.activity-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.activity-info{flex:1;}
+.activity-name{font-size:14px;font-weight:600;}
+.activity-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.activity-amount{font-size:15px;font-weight:700;text-align:left;}
+.activity-date{font-size:11px;color:var(--text3);text-align:left;margin-top:2px;}
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.qa-btn{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all 0.2s;}
+.qa-btn:hover{border-color:var(--border);transform:translateY(-2px);}
+.qa-btn .q-icon{font-size:24px;}
+.qa-btn .q-label{font-size:11px;color:var(--text2);text-align:center;line-height:1.3;}
+
+/* CONTACTS */
+.search-bar{display:flex;gap:10px;margin-bottom:16px;}
+.search-input{flex:1;padding:11px 14px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);font-size:14px;font-family:'Cairo',sans-serif;outline:none;}
+.search-input:focus{border-color:var(--gold);}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;}
+.filter-chip{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;border:1px solid var(--border2);background:var(--card);color:var(--text2);font-family:'Cairo',sans-serif;transition:all 0.2s;}
+.filter-chip.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.contact-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:16px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;}
+.contact-card:hover{border-color:var(--border);transform:translateX(-2px);}
+.contact-top{display:flex;align-items:center;gap:12px;}
+.contact-avatar{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;font-weight:700;}
+.contact-info{flex:1;}
+.contact-name{font-size:15px;font-weight:700;}
+.contact-type{font-size:11px;margin-top:3px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;}
+.contact-phone{font-size:12px;color:var(--text2);margin-top:4px;}
+.contact-balance{text-align:left;}
+.contact-balance-amount{font-size:16px;font-weight:800;}
+.contact-balance-label{font-size:10px;color:var(--text3);text-align:left;}
+
+/* TRANSACTIONS */
+.tx-filters{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+.tx-item{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:14px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;}
+.tx-item:hover{border-color:var(--border);}
+.tx-top{display:flex;align-items:center;gap:12px;}
+.tx-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.tx-info{flex:1;}
+.tx-name{font-size:14px;font-weight:700;}
+.tx-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.tx-amount{font-size:16px;font-weight:800;}
+.tx-date{font-size:11px;color:var(--text3);text-align:left;margin-top:2px;}
+.tx-tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.tag{padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600;}
+
+/* ADD FORM */
+.form-section{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:18px;margin-bottom:16px;}
+.form-section-title{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.currency-row{display:grid;grid-template-columns:2fr 1fr;gap:10px;}
+.photo-upload{border:2px dashed var(--border);border-radius:var(--r2);padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.photo-upload:hover{border-color:var(--gold);background:var(--gold3);}
+.photo-upload .up-icon{font-size:32px;margin-bottom:8px;}
+.photo-upload p{font-size:13px;color:var(--text2);}
+.photos-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.photo-thumb{width:70px;height:70px;border-radius:var(--r3);object-fit:cover;border:1px solid var(--border);}
+
+/* REPORTS */
+.report-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+.report-card{border-radius:var(--r2);padding:16px;border:1px solid transparent;}
+.chart-placeholder{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:20px;margin-bottom:16px;}
+.chart-title{font-size:14px;font-weight:700;margin-bottom:16px;}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;}
+.bar{width:100%;border-radius:6px 6px 0 0;transition:all 0.5s;min-height:4px;}
+.bar-label{font-size:10px;color:var(--text3);}
+.pie-row{display:flex;gap:16px;align-items:center;}
+.pie-legend{flex:1;}
+.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px;}
+.legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.pie-circle{width:110px;height:110px;border-radius:50%;flex-shrink:0;position:relative;}
+
+/* SETTINGS */
+.settings-section{margin-bottom:20px;}
+.settings-title{font-size:13px;color:var(--text3);font-weight:700;margin-bottom:10px;padding-right:4px;text-transform:uppercase;letter-spacing:1px;}
+.settings-item{background:var(--card);border:1px solid var(--border2);display:flex;align-items:center;gap:14px;padding:15px 16px;cursor:pointer;transition:all 0.2s;}
+.settings-item:first-child{border-radius:var(--r2) var(--r2) 0 0;}
+.settings-item:last-child{border-radius:0 0 var(--r2) var(--r2);border-bottom:1px solid var(--border2);}
+.settings-item:not(:last-child){border-bottom:1px solid var(--border2);}
+.settings-item:only-child{border-radius:var(--r2);}
+.settings-item:hover{background:var(--card2);}
+.s-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.s-info{flex:1;}
+.s-label{font-size:14px;font-weight:600;}
+.s-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.s-arrow{color:var(--text3);font-size:16px;}
+.toggle{width:44px;height:24px;background:var(--bg3);border-radius:12px;position:relative;cursor:pointer;transition:all 0.2s;border:1px solid var(--border2);}
+.toggle.on{background:var(--green);}
+.toggle::after{content:'';position:absolute;top:2px;right:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:all 0.2s;}
+.toggle.on::after{right:calc(100% - 20px);}
+.profile-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:20px;display:flex;align-items:center;gap:16px;}
+.profile-avatar{width:72px;height:72px;background:linear-gradient(135deg,var(--blue2),var(--purple));border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;}
+.profile-info h2{font-size:18px;font-weight:800;}
+.profile-info p{font-size:13px;color:var(--text2);margin-top:4px;}
+.profile-info .phone{font-size:12px;color:var(--text3);margin-top:2px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;backdrop-filter:blur(4px);}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:24px 24px 0 0;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform 0.3s ease;padding:20px;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:20px;}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
+.modal-actions .btn{flex:1;}
+.btn-danger{background:var(--red2);color:var(--red);border:1px solid rgba(252,129,129,0.3);}
+
+/* SHARE MODAL */
+.share-options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.share-opt{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.share-opt:hover{border-color:var(--border);transform:translateY(-2px);}
+.share-opt .s-o-icon{font-size:28px;margin-bottom:8px;}
+.share-opt .s-o-label{font-size:12px;color:var(--text2);font-weight:600;}
+
+/* REMINDERS */
+.reminder-item{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.reminder-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.reminder-info{flex:1;}
+.reminder-name{font-size:14px;font-weight:600;}
+.reminder-due{font-size:12px;margin-top:3px;}
+.reminder-amount{font-size:15px;font-weight:700;}
+
+/* NOTIFICATIONS */
+.notif-item{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);padding:14px;margin-bottom:10px;display:flex;gap:12px;cursor:pointer;transition:all 0.2s;}
+.notif-item.unread{border-color:var(--blue);background:var(--blue3);}
+.notif-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.notif-text{flex:1;}
+.notif-title{font-size:13px;font-weight:700;}
+.notif-body{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.4;}
+.notif-time{font-size:11px;color:var(--text3);margin-top:6px;}
+
+/* CURRENCIES */
+.currency-badge{padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;background:var(--bg3);border:1px solid var(--border2);cursor:pointer;}
+.currency-badge.active{background:var(--gold);color:#000;border-color:var(--gold);}
+
+/* SUBSCRIPTION */
+.plan-card{border:2px solid var(--border2);border-radius:var(--r);padding:20px;margin-bottom:14px;cursor:pointer;transition:all 0.2s;position:relative;}
+.plan-card.active-plan{border-color:var(--gold);background:var(--gold3);}
+.plan-badge{position:absolute;top:-10px;right:16px;background:var(--gold);color:#000;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;}
+.plan-name{font-size:18px;font-weight:800;margin-bottom:6px;}
+.plan-price{font-size:28px;font-weight:900;color:var(--gold);}
+.plan-price span{font-size:14px;color:var(--text2);font-weight:400;}
+.plan-features{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+.plan-feat{display:flex;align-items:center;gap:8px;font-size:13px;}
+.plan-feat::before{content:'✓';color:var(--green);font-weight:700;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px 20px;}
+.empty-icon{font-size:52px;margin-bottom:14px;opacity:0.5;}
+.empty-title{font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text2);}
+.empty-sub{font-size:13px;color:var(--text3);}
+
+/* FAB */
+.fab{position:fixed;bottom:90px;left:20px;width:56px;height:56px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(246,201,14,0.4);z-index:99;transition:all 0.2s;border:none;}
+.fab:hover{transform:scale(1.1);}
+
+/* STATUS COLORS */
+.green{color:var(--green);} .red{color:var(--red);} .blue{color:var(--blue);}
+.gold{color:var(--gold);} .purple{color:var(--purple);} .orange{color:var(--orange);}
+.bg-green{background:var(--green2);} .bg-red{background:var(--red2);}
+.bg-blue{background:var(--blue3);} .bg-gold{background:var(--gold3);}
+.bg-purple{background:var(--purple2);} .bg-orange{background:var(--orange2);}
+
+/* RESPONSIVE */
+@media(min-width:768px){
+  .bottom-nav{max-width:500px;left:50%;transform:translateX(-50%);}
+  .page-content{max-width:500px;margin:0 auto;}
+  .header{max-width:500px;margin:0 auto;left:50%;transform:translateX(-50%);width:100%;}
+  .fab{left:calc(50% - 230px);}
+  .modal{max-width:500px;}
+}
+
+/* ANIMATIONS */
+.fade-in{animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.shimmer{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* TERMINOLOGY PRESETS */
+.term-preset{display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;color:var(--text2);}
+.term-preset:hover{background:var(--gold3);border-color:var(--gold);color:var(--gold);}
+
+/* DASHBOARD WIDGET TOGGLE ROWS */
+.dash-widget-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--card);border-bottom:1px solid var(--border2);}
+.dash-widget-row:first-child{border-radius:var(--r2) var(--r2) 0 0;}
+.dash-widget-row:last-child{border-radius:0 0 var(--r2) var(--r2);border-bottom:none;}
+.dash-widget-row:only-child{border-radius:var(--r2);}
+.dw-left{display:flex;align-items:center;gap:12px;}
+.dw-icon{font-size:20px;width:36px;text-align:center;}
+.dw-label{font-size:14px;font-weight:600;}
+.dw-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+
+/* LIGHT MODE */
+body.light-mode{--bg:#f0f4f8;--bg2:#e8edf2;--bg3:#dde3ea;--bg4:#d0d8e0;--card:#ffffff;--card2:#f5f7fa;--border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.07);--text:#1a202c;--text2:#4a5568;--text3:#718096;}
+body.light-mode .header{background:rgba(255,255,255,0.95);}
+body.light-mode .bottom-nav{background:rgba(255,255,255,0.95);}
+body.light-mode .balance-card{background:linear-gradient(135deg,#e8edf2,#dde3ea);}
+body.light-mode .sd-dropdown{background:#fff;border-color:rgba(0,0,0,0.12);}
+body.light-mode .sd-search-wrap{background:#fff;}
+body.light-mode .sd-option:hover{background:#f5f7fa;}
+
+/* MAP PICKER MODAL fullscreen fix */
+#mapPickerModal{align-items:stretch !important;}
+#mapPickerModal .modal{border-radius:0 !important;max-height:100vh !important;height:100% !important;display:flex !important;flex-direction:column !important;padding:0 !important;margin:0 !important;max-width:100% !important;}
+#mapPickerModal.open{display:flex !important;}
+.leaflet-container{background:#0a0f1e!important;font-family:'Cairo',sans-serif;}
+.leaflet-tile{filter:brightness(0.85) saturate(1.1);}
+.map-marker-wrap{display:flex;flex-direction:column;align-items:center;cursor:pointer;}
+.map-marker-pin{width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.3);}
+.map-marker-pin span{transform:rotate(45deg);font-size:16px;}
+.map-marker-label{margin-top:4px;background:rgba(10,15,30,0.88);color:#e2e8f0;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(99,179,237,0.2);}
+.leaflet-popup-content-wrapper{background:var(--card2)!important;border:1px solid var(--border)!important;border-radius:14px!important;box-shadow:0 8px 32px rgba(0,0,0,0.5)!important;color:var(--text)!important;}
+.leaflet-popup-tip{background:var(--card2)!important;}
+.leaflet-popup-content{margin:14px 16px!important;font-family:'Cairo',sans-serif!important;}
+.map-popup-name{font-size:15px;font-weight:800;margin-bottom:4px;}
+.map-popup-type{font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;display:inline-block;margin-bottom:8px;}
+.map-popup-bal{font-size:13px;font-weight:700;margin-bottom:8px;}
+.map-popup-btns{display:flex;gap:8px;}
+.map-popup-btn{padding:7px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Cairo',sans-serif;flex:1;text-align:center;}
+.leaflet-control-zoom a{background:var(--card2)!important;color:var(--text)!important;border-color:var(--border)!important;}
+.leaflet-control-attribution{background:rgba(10,15,30,0.7)!important;color:var(--text3)!important;}
+.sd-wrap{position:relative;width:100%;}
+.sd-trigger{width:100%;padding:12px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r3);color:var(--text);font-size:14px;font-family:'Cairo',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:all 0.2s;user-select:none;min-height:46px;}
+.sd-trigger:hover,.sd-trigger.open{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold3);}
+.sd-trigger-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+.sd-trigger-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.sd-trigger-text{flex:1;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;}
+.sd-trigger-text.placeholder{color:var(--text3);font-weight:400;}
+.sd-trigger-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;flex-shrink:0;}
+.sd-trigger-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.sd-clear{font-size:14px;color:var(--text3);cursor:pointer;padding:2px 4px;border-radius:4px;transition:color 0.15s;display:none;}
+.sd-clear:hover{color:var(--red);}
+.sd-arrow{font-size:10px;color:var(--text3);transition:transform 0.2s;}
+.sd-trigger.open .sd-arrow{transform:rotate(180deg);}
+.sd-overlay{position:fixed;inset:0;z-index:499;}
+.sd-dropdown{position:absolute;top:calc(100% + 6px);right:0;left:0;background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);z-index:500;box-shadow:0 16px 48px rgba(0,0,0,0.6);overflow:hidden;animation:sdDrop 0.18s ease;}
+@keyframes sdDrop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.sd-search-wrap{padding:10px;border-bottom:1px solid var(--border2);position:sticky;top:0;background:var(--card2);z-index:1;display:flex;align-items:center;gap:8px;}
+.sd-search-icon{font-size:15px;color:var(--text3);flex-shrink:0;}
+.sd-search{flex:1;padding:9px 0;background:transparent;border:none;color:var(--text);font-size:13px;font-family:'Cairo',sans-serif;outline:none;}
+.sd-search::placeholder{color:var(--text3);}
+.sd-count{font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:10px;flex-shrink:0;}
+.sd-list{max-height:240px;overflow-y:auto;padding:6px;}
+.sd-list::-webkit-scrollbar{width:4px;}
+.sd-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.sd-option{padding:9px 10px;border-radius:var(--r3);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background 0.12s;}
+.sd-option:hover{background:var(--bg3);}
+.sd-option.selected{background:var(--gold3);}
+.sd-opt-avatar{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.sd-opt-info{flex:1;min-width:0;}
+.sd-opt-name{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sd-opt-sub{font-size:11px;color:var(--text3);margin-top:1px;display:flex;align-items:center;gap:6px;}
+.sd-opt-check{margin-right:auto;color:var(--gold);font-size:14px;opacity:0;transition:opacity 0.15s;}
+.sd-option.selected .sd-opt-check{opacity:1;}
+.sd-opt-balance{font-size:11px;font-weight:700;text-align:left;flex-shrink:0;}
+.sd-group-label{padding:10px 10px 4px;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
+.sd-divider{height:1px;background:var(--border2);margin:4px 0;}
+.sd-empty{padding:24px 16px;text-align:center;color:var(--text3);}
+.sd-empty-icon{font-size:28px;margin-bottom:8px;}
+.sd-empty-text{font-size:13px;}
+.sd-footer{padding:8px 10px;border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
+.sd-footer-add{font-size:12px;color:var(--gold);cursor:pointer;display:flex;align-items:center;gap:5px;font-weight:600;}
+.sd-footer-add:hover{text-decoration:underline;}
+/* highlight match */
+.sd-highlight{color:var(--gold);font-weight:800;}
+
+/* CURRENCY ROW */
+.currency-input-wrap{position:relative;}
+.currency-label{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);font-weight:700;}
+.currency-input-wrap input{padding-left:40px;}
+
+/* TOAST */
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 20px;font-size:14px;font-weight:600;z-index:999;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.success{border-color:var(--green);color:var(--green);}
+.toast.error{border-color:var(--red);color:var(--red);}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- SPLASH SCREEN -->
+<div class="screen active" id="splash">
+  <div class="splash-wrap">
+    <div class="splash-icon">💰</div>
+    <div class="splash-title">حسابي</div>
+    <div class="splash-sub">إدارة مالية ذكية ومتكاملة</div>
+    <div class="splash-bar"><div class="splash-fill"></div></div>
+  </div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div class="screen" id="login">
+  <div class="login-box">
+    <div class="l-logo">
+      <div class="l-icon">💰</div>
+      <h1>حسابي</h1>
+      <p>إدارة مالية ذكية ومتكاملة</p>
+    </div>
+    <!-- login panel -->
+    <div id="loginPanel">
+      <div class="l-tabs">
+        <button class="l-tab active" onclick="switchLoginTab('login')">تسجيل الدخول</button>
+        <button class="l-tab" onclick="switchLoginTab('register')">حساب جديد</button>
+      </div>
+      <div id="loginForm">
+        <div class="field"><label>رقم الجوال</label><input type="tel" id="loginPhone" placeholder="05xxxxxxxx" maxlength="10"></div>
+        <div class="field"><label>كلمة المرور</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+        <div class="l-forgot" onclick="showOTP()">نسيت كلمة المرور؟</div>
+        <br>
+        <button class="btn btn-gold" onclick="doLogin()">دخول</button>
+      </div>
+      <div id="registerForm" style="display:none">
+        <div class="field"><label>الاسم الكامل</label><input type="text" id="regName" placeholder="محمد أحمد"></div>
+        <div class="field"><label>رقم الجوال</label><input type="tel" id="regPhone" placeholder="05xxxxxxxx" maxlength="10"></div>
+        <div class="field"><label>كلمة المرور</label><input type="password" id="regPass" placeholder="٨ أحرف على الأقل"></div>
+        <div class="field"><label>تأكيد كلمة المرور</label><input type="password" id="regPass2" placeholder="••••••••"></div>
+        <button class="btn btn-gold" onclick="doRegister()">إنشاء الحساب</button>
+      </div>
+    </div>
+    <!-- OTP panel -->
+    <div id="otpPanel" style="display:none">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:36px;margin-bottom:10px;">📱</div>
+        <div style="font-size:16px;font-weight:700;">أدخل رمز التحقق</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;">تم إرسال رمز مكون من 4 أرقام</div>
+      </div>
+      <div class="otp-row">
+        <input class="otp-input" maxlength="1" oninput="otpNext(this,0)" id="otp0">
+        <input class="otp-input" maxlength="1" oninput="otpNext(this,1)" id="otp1">
+        <input class="otp-input" maxlength="1" oninput="otpNext(this,2)" id="otp2">
+        <input class="otp-input" maxlength="1" oninput="otpNext(this,3)" id="otp3">
+      </div>
+      <button class="btn btn-gold" onclick="verifyOTP()">تحقق</button>
+      <div class="l-switch" style="margin-top:14px;"><span onclick="backToLogin()">← رجوع لتسجيل الدخول</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="screen" id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">
+      <div class="ico">💰</div>
+      <span>حسابي</span>
+    </div>
+    <div class="header-actions">
+      <div class="icon-btn" onclick="showPage('notifications')">🔔<span class="notif-badge" id="notifBadge">3</span></div>
+      <div class="icon-btn" onclick="openSearch()">🔍</div>
+      <div class="avatar" onclick="showPage('settings')" id="userAvatar">م</div>
+    </div>
+  </div>
+
+  <!-- PAGES -->
+
+  <!-- HOME -->
+  <div class="page-content fade-in" id="page-home">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-size:13px;color:var(--text2);">مرحباً 👋</div>
+        <div style="font-size:20px;font-weight:800;" id="welcomeName">محمد أحمد</div>
+      </div>
+      <div style="font-size:13px;color:var(--text2);" id="todayDate"></div>
+    </div>
+
+    <!-- Balance Card -->
+    <div class="balance-card" id="widget-balance">
+      <div class="balance-label">الرصيد الإجمالي</div>
+      <div class="balance-amount" id="totalBalance">0 ر.س</div>
+      <div class="balance-row">
+        <div class="bal-mini">
+          <div class="bal-mini-label" id="labelForMe">لي (مستحق)</div>
+          <div class="bal-mini-val green" id="totalFor">0 ر.س</div>
+        </div>
+        <div class="bal-mini">
+          <div class="bal-mini-label" id="labelOnMe">علي (مديونية)</div>
+          <div class="bal-mini-val red" id="totalOn">0 ر.س</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions" id="widget-quickactions" id2="quick-actions-bar"></div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="widget-stats">
+      <div class="stat-card" onclick="showPage('contacts')">
+        <div class="stat-icon">👥</div>
+        <div class="stat-val" id="contactsCount">0</div>
+        <div class="stat-label">جهات الاتصال</div>
+      </div>
+      <div class="stat-card" onclick="showPage('transactions')">
+        <div class="stat-icon">📋</div>
+        <div class="stat-val" id="txCount">0</div>
+        <div class="stat-label">المعاملات</div>
+      </div>
+      <div class="stat-card" onclick="showPage('reminders')">
+        <div class="stat-icon">⏰</div>
+        <div class="stat-val" id="remindersCount">0</div>
+        <div class="stat-label">تذكيرات</div>
+      </div>
+      <div class="stat-card" onclick="showPage('reports')">
+        <div class="stat-icon">📈</div>
+        <div class="stat-val green" id="settledCount">0</div>
+        <div class="stat-label">مسوّاة</div>
+      </div>
+    </div>
+
+    <!-- Recent -->
+    <div id="widget-recent">
+      <div class="section-header">
+        <div class="section-title">آخر المعاملات</div>
+        <div class="see-all" onclick="showPage('transactions')">عرض الكل</div>
+      </div>
+      <div class="card" id="recentList">
+        <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">لا توجد معاملات بعد</div><div class="empty-sub">ابدأ بإضافة معاملة جديدة</div></div>
+      </div>
+    </div><!-- end widget-recent -->
+  </div><!-- end page-home -->
+
+  <!-- CONTACTS -->
+  <div class="page-content fade-in" id="page-contacts" style="display:none">
+    <div class="page-title">جهات الاتصال</div>
+    <div class="search-bar">
+      <input class="search-input" placeholder="بحث عن جهة..." id="contactSearch" oninput="filterContacts()">
+      <button class="btn" style="width:auto;padding:11px 14px;background:var(--purple2);border:1px solid var(--purple);color:var(--purple);" onclick="showPage('map')">🗺️</button>
+      <button class="btn btn-gold" style="width:auto;padding:11px 16px;" onclick="showAddContact()">+ إضافة</button>
+    </div>
+    <div class="filter-row">
+      <button class="filter-chip active" onclick="filterByType(this,'all')">الكل</button>
+      <button class="filter-chip" onclick="filterByType(this,'عميل')">عملاء</button>
+      <button class="filter-chip" onclick="filterByType(this,'مورد')">موردون</button>
+      <button class="filter-chip" onclick="filterByType(this,'مندوب')">مندوبون</button>
+      <button class="filter-chip" onclick="filterByType(this,'دائن')">دائنون</button>
+      <button class="filter-chip" onclick="filterByType(this,'مدين')">مدينون</button>
+    </div>
+    <div id="contactsList"></div>
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <div class="page-content fade-in" id="page-transactions" style="display:none">
+    <div class="page-title">المعاملات</div>
+    <div class="search-bar">
+      <input class="search-input" placeholder="بحث..." id="txSearch" oninput="filterTx()">
+      <button class="btn btn-gold" style="width:auto;padding:11px 16px;" onclick="openAddModal()">+ إضافة</button>
+    </div>
+    <div class="filter-row" id="txFilters">
+      <button class="filter-chip active" onclick="filterTxType(this,'all')">الكل</button>
+      <button class="filter-chip" onclick="filterTxType(this,'incoming')">لي 📥</button>
+      <button class="filter-chip" onclick="filterTxType(this,'outgoing')">علي 📤</button>
+      <button class="filter-chip" onclick="filterTxType(this,'settled')">مسوّاة ✅</button>
+    </div>
+    <div id="txList"></div>
+  </div>
+
+  <!-- ADD/EDIT -->
+  <div class="page-content fade-in" id="page-add" style="display:none">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <div class="icon-btn" onclick="showPage('transactions')">←</div>
+      <div class="page-title" style="margin:0" id="addFormTitle">إضافة معاملة</div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">📋 بيانات المعاملة</div>
+      <div class="field">
+        <label>النوع</label>
+        <select id="txType" onchange="updateTxTypeUI()">
+          <option value="incoming">📥 لي (مستحق عليهم)</option>
+          <option value="outgoing">📤 علي (مديونية)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>الجهة</label>
+        <div class="sd-wrap" id="sd-txContact"></div>
+        <input type="hidden" id="txContact">
+      </div>
+      <div class="field">
+        <label>المبلغ والعملة</label>
+        <div class="currency-row">
+          <input type="number" id="txAmount" placeholder="0.00" min="0">
+          <select id="txCurrency">
+            <option value="ر.س">ر.س</option>
+            <option value="$">دولار $</option>
+            <option value="€">يورو €</option>
+            <option value="£">جنيه £</option>
+            <option value="د.إ">درهم د.إ</option>
+            <option value="د.ك">دينار د.ك</option>
+            <option value="د.ب">دينار د.ب</option>
+            <option value="ر.ع">ريال عماني</option>
+            <option value="ر.ق">ريال قطري</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>التاريخ</label>
+        <input type="date" id="txDate">
+      </div>
+      <div class="field">
+        <label>تاريخ الاستحقاق (اختياري)</label>
+        <input type="date" id="txDueDate">
+      </div>
+      <div class="field">
+        <label>ملاحظات</label>
+        <textarea id="txNotes" rows="3" placeholder="وصف المعاملة..."></textarea>
+      </div>
+      <div class="field">
+        <label>الحالة</label>
+        <select id="txStatus">
+          <option value="pending">🕐 معلقة</option>
+          <option value="partial">🔄 مدفوعة جزئياً</option>
+          <option value="settled">✅ مسوّاة</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">📎 المرفقات</div>
+      <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+        <div class="up-icon">📷</div>
+        <p>إضافة صور أو مستندات</p>
+        <p style="font-size:11px;margin-top:4px;color:var(--text3)">اضغط لاختيار الصور</p>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="previewPhotos(this)">
+      <div class="photos-preview" id="photosPreview"></div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">⏰ تذكير السداد</div>
+      <div class="field">
+        <label>تفعيل التذكير</label>
+        <select id="reminderType">
+          <option value="none">بدون تذكير</option>
+          <option value="duedate">عند تاريخ الاستحقاق</option>
+          <option value="3days">قبل 3 أيام</option>
+          <option value="week">قبل أسبوع</option>
+          <option value="monthly">شهري</option>
+        </select>
+      </div>
+    </div>
+
+    <input type="hidden" id="editTxId">
+    <button class="btn btn-gold" onclick="saveTx()">💾 حفظ المعاملة</button>
+    <br><br>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="page-content fade-in" id="page-reports" style="display:none">
+    <div class="page-title">التقارير</div>
+
+    <div class="report-summary">
+      <div class="report-card bg-green" style="border-color:var(--green);">
+        <div style="font-size:12px;color:var(--green);margin-bottom:6px;">إجمالي لي</div>
+        <div class="green" style="font-size:22px;font-weight:800;" id="rptFor">0</div>
+      </div>
+      <div class="report-card bg-red" style="border-color:var(--red);">
+        <div style="font-size:12px;color:var(--red);margin-bottom:6px;">إجمالي علي</div>
+        <div class="red" style="font-size:22px;font-weight:800;" id="rptOn">0</div>
+      </div>
+      <div class="report-card bg-blue" style="border-color:var(--blue);">
+        <div style="font-size:12px;color:var(--blue);margin-bottom:6px;">مسوّاة</div>
+        <div class="blue" style="font-size:22px;font-weight:800;" id="rptSettled">0</div>
+      </div>
+      <div class="report-card bg-gold" style="border-color:var(--gold);">
+        <div style="font-size:12px;color:var(--gold);margin-bottom:6px;">الصافي</div>
+        <div class="gold" style="font-size:22px;font-weight:800;" id="rptNet">0</div>
+      </div>
+    </div>
+
+    <div class="chart-placeholder">
+      <div class="chart-title">المعاملات حسب الشهر</div>
+      <div class="bar-chart" id="monthlyChart"></div>
+    </div>
+
+    <div class="chart-placeholder">
+      <div class="chart-title">توزيع حسب نوع الجهة</div>
+      <div class="pie-row">
+        <div id="pieChart" style="width:110px;height:110px;border-radius:50%;background:conic-gradient(var(--green) 0% 40%,var(--red) 40% 65%,var(--blue) 65% 80%,var(--gold) 80% 100%);flex-shrink:0;"></div>
+        <div class="pie-legend" id="pieLegend"></div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">أعلى الأرصدة</div>
+    </div>
+    <div id="topBalances"></div>
+
+    <div style="margin-top:16px;">
+      <button class="btn btn-gold" onclick="exportReport()">📤 تصدير التقرير</button>
+      <br><br>
+      <button class="btn btn-outline" onclick="shareReport()">📲 مشاركة التقرير</button>
+    </div>
+  </div>
+
+  <!-- REMINDERS -->
+  <div class="page-content fade-in" id="page-reminders" style="display:none">
+    <div class="page-title">تذكيرات السداد</div>
+    <div id="remindersList"></div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="page-content fade-in" id="page-notifications" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div class="page-title" style="margin:0">الإشعارات</div>
+      <div style="font-size:13px;color:var(--blue);cursor:pointer;" onclick="markAllRead()">تحديد كمقروء</div>
+    </div>
+    <div id="notifList"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page-content fade-in" id="page-settings" style="display:none">
+    <div class="page-title">الإعدادات</div>
+
+    <div class="profile-card">
+      <div class="profile-avatar" id="settingsAvatar">م</div>
+      <div class="profile-info">
+        <h2 id="settingsName">محمد أحمد</h2>
+        <p id="settingsEmail">user@hesabi.app</p>
+        <p class="phone" id="settingsPhone">0512345678</p>
+      </div>
+      <div class="icon-btn" onclick="editProfile()">✏️</div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">الحساب</div>
+      <div class="settings-item" onclick="editProfile()">
+        <div class="s-icon bg-blue">👤</div>
+        <div class="s-info"><div class="s-label">تعديل البيانات الشخصية</div><div class="s-sub">الاسم، الجوال، البريد</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+      <div class="settings-item" onclick="changePwd()">
+        <div class="s-icon bg-purple">🔐</div>
+        <div class="s-info"><div class="s-label">تغيير كلمة المرور</div><div class="s-sub">تحديث بيانات الأمان</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+      <div class="settings-item" onclick="showPage('subscription')">
+        <div class="s-icon bg-gold">👑</div>
+        <div class="s-info"><div class="s-label">الاشتراك والباقات</div><div class="s-sub">الباقة الحالية: مجانية</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">التخصيص</div>
+      <div class="settings-item" onclick="showPage('terminology')">
+        <div class="s-icon bg-blue">🏷️</div>
+        <div class="s-info"><div class="s-label">تخصيص المسميات</div><div class="s-sub" id="terminologySubLabel">لي / علي / مدين / دائن...</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+      <div class="settings-item" onclick="showPage('dashboard-settings')">
+        <div class="s-icon bg-purple">🖥️</div>
+        <div class="s-info"><div class="s-label">تخصيص الواجهة الرئيسية</div><div class="s-sub">اختر ما يظهر في الرئيسية</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+      <div class="settings-item" onclick="showPage('branding')">
+        <div class="s-icon bg-gold">🎨</div>
+        <div class="s-info"><div class="s-label">الشعار والألوان</div><div class="s-sub">ثيم التطبيق وشعار المنشأة</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">التطبيق</div>
+      <div class="settings-item" onclick="toggleDarkMode()">
+        <div class="s-icon bg-green">🌙</div>
+        <div class="s-info"><div class="s-label" id="darkModeLabel">الوضع الليلي</div><div class="s-sub" id="darkModeSub">مفعّل</div></div>
+        <div class="toggle on" id="darkToggle"></div>
+      </div>
+      <div class="settings-item" onclick="toggleSetting('notif')">
+        <div class="s-icon bg-orange">🔔</div>
+        <div class="s-info"><div class="s-label">الإشعارات</div><div class="s-sub">تذكيرات السداد والتنبيهات</div></div>
+        <div class="toggle on" id="notifToggle"></div>
+      </div>
+      <div class="settings-item" onclick="changeCurrency()">
+        <div class="s-icon bg-gold">💱</div>
+        <div class="s-info"><div class="s-label">العملة الافتراضية</div><div class="s-sub" id="defaultCurrencyLabel">ريال سعودي (ر.س)</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">البيانات والتقارير</div>
+      <div class="settings-item" onclick="showPage('reports')">
+        <div class="s-icon" style="background:var(--purple2)">📊</div>
+        <div class="s-info"><div class="s-label">التقارير والرسوم البيانية</div><div class="s-sub">إحصائيات وتحليلات</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+      <div class="settings-item" onclick="showPage('reminders')">
+        <div class="s-icon bg-orange">⏰</div>
+        <div class="s-info"><div class="s-label">تذكيرات السداد</div><div class="s-sub">إدارة التذكيرات</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+      <div class="settings-item" onclick="backupData()">
+        <div class="s-icon bg-blue">☁️</div>
+        <div class="s-info"><div class="s-label">النسخ الاحتياطي</div><div class="s-sub">آخر نسخ: اليوم</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+      <div class="settings-item" onclick="restoreData()">
+        <div class="s-icon bg-purple">🔄</div>
+        <div class="s-info"><div class="s-label">استعادة البيانات</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+      <div class="settings-item" onclick="exportAll()">
+        <div class="s-icon bg-green">📤</div>
+        <div class="s-info"><div class="s-label">تصدير البيانات</div><div class="s-sub">Excel أو PDF</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">أخرى</div>
+      <div class="settings-item" onclick="showAbout()">
+        <div class="s-icon" style="background:var(--bg3)">ℹ️</div>
+        <div class="s-info"><div class="s-label">عن التطبيق</div><div class="s-sub">الإصدار 1.0.0</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+      <div class="settings-item" onclick="doLogout()">
+        <div class="s-icon bg-red">🚪</div>
+        <div class="s-info"><div class="s-label" style="color:var(--red)">تسجيل الخروج</div></div>
+        <div class="s-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMINOLOGY PAGE -->
+  <div class="page-content fade-in" id="page-terminology" style="display:none">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <div class="icon-btn" onclick="showPage('settings')">←</div>
+      <div class="page-title" style="margin:0">تخصيص المسميات</div>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">غيّر أسماء العمليات حسب طبيعة عملك</div>
+
+    <div class="form-section">
+      <div class="form-section-title">📥 المستحق لك (لي)</div>
+      <div class="field"><label>مسمى العملية الرئيسي</label>
+        <input type="text" id="termIncoming" placeholder="مثال: لي، دين، مبيعات، إيرادات">
+      </div>
+      <div class="field"><label>مسمى بديل / وصف</label>
+        <input type="text" id="termIncomingSub" placeholder="مثال: مستحق عليهم، ديون العملاء">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        <span class="term-preset" onclick="setTerm('incoming','لي','مستحق لي')">لي</span>
+        <span class="term-preset" onclick="setTerm('incoming','دين','ديون العملاء')">دين</span>
+        <span class="term-preset" onclick="setTerm('incoming','مبيعات','إيرادات مبيعات')">مبيعات</span>
+        <span class="term-preset" onclick="setTerm('incoming','إيرادات','إيرادات وأرباح')">إيرادات</span>
+        <span class="term-preset" onclick="setTerm('incoming','تحصيل','مبالغ للتحصيل')">تحصيل</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">📤 المستحق عليك (علي)</div>
+      <div class="field"><label>مسمى العملية الرئيسي</label>
+        <input type="text" id="termOutgoing" placeholder="مثال: علي، مديونية، مشتريات، مصاريف">
+      </div>
+      <div class="field"><label>مسمى بديل / وصف</label>
+        <input type="text" id="termOutgoingSub" placeholder="مثال: مستحق عليّ، التزامات">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        <span class="term-preset" onclick="setTerm('outgoing','علي','مستحق علي')">علي</span>
+        <span class="term-preset" onclick="setTerm('outgoing','مديونية','التزامات مالية')">مديونية</span>
+        <span class="term-preset" onclick="setTerm('outgoing','مشتريات','مستحق للموردين')">مشتريات</span>
+        <span class="term-preset" onclick="setTerm('outgoing','مصاريف','مصاريف ونفقات')">مصاريف</span>
+        <span class="term-preset" onclick="setTerm('outgoing','التزامات','التزامات مالية')">التزامات</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">🤝 مسميات أنواع الجهات</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field" style="margin:0"><label>نوع 1 (عميل)</label><input type="text" id="termClient" placeholder="عميل"></div>
+        <div class="field" style="margin:0"><label>نوع 2 (مورد)</label><input type="text" id="termSupplier" placeholder="مورد"></div>
+        <div class="field" style="margin:0"><label>نوع 3 (مندوب)</label><input type="text" id="termAgent" placeholder="مندوب"></div>
+        <div class="field" style="margin:0"><label>نوع 4 (دائن)</label><input type="text" id="termCreditor" placeholder="دائن"></div>
+        <div class="field" style="margin:0"><label>نوع 5 (مدين)</label><input type="text" id="termDebtor" placeholder="مدين"></div>
+        <div class="field" style="margin:0"><label>نوع 6 (شريك)</label><input type="text" id="termPartner" placeholder="شريك"></div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">📊 مسميات الكشوف والتقارير</div>
+      <div class="field"><label>عنوان الكشف الرئيسي</label>
+        <input type="text" id="termStatement" placeholder="كشف الحسابات">
+      </div>
+      <div class="field"><label>اسم التطبيق / المنشأة في التقارير</label>
+        <input type="text" id="termAppName" placeholder="حسابي">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-gold" onclick="saveTerminology()">💾 حفظ المسميات</button>
+      <button class="btn btn-outline" style="width:auto;padding:13px 20px;" onclick="resetTerminology()">↺ إعادة تعيين</button>
+    </div>
+    <br>
+  </div>
+
+  <!-- DASHBOARD SETTINGS PAGE -->
+  <div class="page-content fade-in" id="page-dashboard-settings" style="display:none">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <div class="icon-btn" onclick="showPage('settings')">←</div>
+      <div class="page-title" style="margin:0">تخصيص الواجهة الرئيسية</div>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">اختر العناصر التي تظهر في صفحتك الرئيسية</div>
+
+    <div class="form-section">
+      <div class="form-section-title">📦 العناصر المرئية</div>
+      <div id="dashWidgetsList"></div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">⚡ الأزرار السريعة</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">اختر ما يظهر في شريط الأزرار السريعة (الحد الأقصى 4)</div>
+      <div id="dashQuickList"></div>
+    </div>
+
+    <button class="btn btn-gold" onclick="saveDashboardSettings()">💾 حفظ الإعدادات</button>
+    <br><br>
+  </div>
+
+  <!-- SUBSCRIPTION -->
+  <div class="page-content fade-in" id="page-subscription" style="display:none">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <div class="icon-btn" onclick="showPage('settings')">←</div>
+      <div class="page-title" style="margin:0">الاشتراك والباقات</div>
+    </div>
+
+    <div class="plan-card active-plan">
+      <div class="plan-badge">✓ حالياً</div>
+      <div class="plan-name">المجانية</div>
+      <div class="plan-price">0 <span>/ شهر</span></div>
+      <div class="plan-features">
+        <div class="plan-feat">50 معاملة شهرياً</div>
+        <div class="plan-feat">10 جهات اتصال</div>
+        <div class="plan-feat">تقارير أساسية</div>
+        <div class="plan-feat">تصدير محدود</div>
+      </div>
+    </div>
+
+    <div class="plan-card" onclick="subscribePro()">
+      <div class="plan-badge" style="background:var(--blue);color:#fff;">⭐ مميز</div>
+      <div class="plan-name">الاحترافية</div>
+      <div class="plan-price">29 <span>ر.س / شهر</span></div>
+      <div class="plan-features">
+        <div class="plan-feat">معاملات غير محدودة</div>
+        <div class="plan-feat">جهات اتصال غير محدودة</div>
+        <div class="plan-feat">تقارير متقدمة + رسوم بيانية</div>
+        <div class="plan-feat">تصدير PDF وExcel</div>
+        <div class="plan-feat">نسخ احتياطي تلقائي</div>
+        <div class="plan-feat">دعم فني أولوية</div>
+      </div>
+    </div>
+
+    <div class="plan-card" onclick="subscribeBusiness()">
+      <div class="plan-badge" style="background:var(--gold);color:#000;">💎 أعمال</div>
+      <div class="plan-name">الأعمال</div>
+      <div class="plan-price">79 <span>ر.س / شهر</span></div>
+      <div class="plan-features">
+        <div class="plan-feat">كل مميزات الاحترافية</div>
+        <div class="plan-feat">حتى 5 مستخدمين</div>
+        <div class="plan-feat">فواتير وإيصالات</div>
+        <div class="plan-feat">مزامنة فورية</div>
+        <div class="plan-feat">API للتكامل</div>
+        <div class="plan-feat">مدير حساب مخصص</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATEMENTS PAGE -->
+  <div class="page-content fade-in" id="page-statements" style="display:none">
+    <div class="page-title">كشوف الحسابات</div>
+
+    <!-- Filter Panel -->
+    <div class="form-section" style="margin-bottom:16px;">
+      <div class="form-section-title">🔍 فلترة الكشف</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div class="field" style="margin:0">
+          <label>من تاريخ</label>
+          <input type="date" id="stFromDate">
+        </div>
+        <div class="field" style="margin:0">
+          <label>إلى تاريخ</label>
+          <input type="date" id="stToDate">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>الجهة / الشخص</label>
+        <div class="sd-wrap" id="sd-stContact"></div>
+        <input type="hidden" id="stContact">
+      </div>
+
+      <div class="field">
+        <label>نوع الجهة</label>
+        <select id="stContactType">
+          <option value="">الكل</option>
+          <option value="عميل">👤 عملاء</option>
+          <option value="مورد">🏭 موردون</option>
+          <option value="مندوب">🚗 مندوبون</option>
+          <option value="دائن">💸 دائنون</option>
+          <option value="مدين">🤝 مدينون</option>
+          <option value="شريك">🤝 شركاء</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>نوع المعاملة</label>
+        <select id="stTxType">
+          <option value="">الكل</option>
+          <option value="incoming">📥 لي فقط</option>
+          <option value="outgoing">📤 علي فقط</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>الحالة</label>
+        <select id="stStatus">
+          <option value="">الكل</option>
+          <option value="pending">🕐 معلقة</option>
+          <option value="partial">🔄 جزئية</option>
+          <option value="settled">✅ مسوّاة</option>
+        </select>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button class="btn btn-gold" onclick="generateStatement()">🔄 توليد الكشف</button>
+        <button class="btn btn-outline" onclick="resetStFilters()">↺ إعادة تعيين</button>
+      </div>
+    </div>
+
+    <!-- Statement Type Tabs -->
+    <div class="l-tabs" style="margin-bottom:16px;">
+      <button class="l-tab active" id="stTabTotal" onclick="switchStTab('total')">إجمالي</button>
+      <button class="l-tab" id="stTabAnalytic" onclick="switchStTab('analytic')">تحليلي</button>
+      <button class="l-tab" id="stTabPerson" onclick="switchStTab('person')">بالشخص</button>
+    </div>
+
+    <!-- Statement Output -->
+    <div id="statementOutput"></div>
+
+    <!-- Export Buttons -->
+    <div id="stExportBtns" style="display:none;margin-top:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <button class="btn" style="background:var(--red2);color:var(--red);border:1px solid rgba(252,129,129,0.3);" onclick="exportStatementPDF()">📄 تصدير PDF</button>
+        <button class="btn" style="background:var(--green2);color:var(--green);border:1px solid rgba(72,187,120,0.3);" onclick="exportStatementExcel()">📊 تصدير Excel</button>
+      </div>
+      <button class="btn btn-outline" onclick="shareStatement()">📲 مشاركة الكشف</button>
+    </div>
+    <br>
+  </div>
+
+  <!-- BRANDING PAGE -->
+  <div class="page-content fade-in" id="page-branding" style="display:none">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <div class="icon-btn" onclick="showPage('settings')">←</div>
+      <div class="page-title" style="margin:0">تخصيص الشعار والألوان</div>
+    </div>
+
+    <!-- Logo Upload -->
+    <div class="form-section">
+      <div class="form-section-title">🖼️ الشعار</div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div id="logoPreview" style="width:90px;height:90px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;overflow:hidden;">💰</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:8px;">شعار المنشأة</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">يظهر في الكشوف والتقارير المصدّرة</div>
+          <button class="btn btn-outline" style="width:auto;padding:10px 16px;font-size:13px;" onclick="document.getElementById('logoInput').click()">📷 رفع شعار</button>
+          <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="uploadLogo(this)">
+        </div>
+      </div>
+      <div class="field">
+        <label>اسم المنشأة في الكشوف</label>
+        <input type="text" id="brandName" placeholder="اسم شركتك أو متجرك">
+      </div>
+      <div class="field">
+        <label>العنوان (اختياري)</label>
+        <input type="text" id="brandAddress" placeholder="المدينة، المملكة العربية السعودية">
+      </div>
+      <div class="field">
+        <label>رقم التواصل</label>
+        <input type="tel" id="brandPhone" placeholder="05xxxxxxxx">
+      </div>
+    </div>
+
+    <!-- Color Themes -->
+    <div class="form-section">
+      <div class="form-section-title">🎨 ثيم الألوان</div>
+      <div style="margin-bottom:14px;font-size:13px;color:var(--text2);">اختر ثيماً جاهزاً أو خصص ألوانك</div>
+      <div id="colorThemes" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;"></div>
+
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">تخصيص يدوي</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field" style="margin:0;">
+          <label>اللون الرئيسي</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="color" id="primaryColor" value="#f6c90e" style="width:44px;height:36px;border-radius:8px;border:1px solid var(--border2);background:none;cursor:pointer;padding:2px;">
+            <input type="text" id="primaryColorHex" value="#f6c90e" style="flex:1;padding:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;">
+          </div>
+        </div>
+        <div class="field" style="margin:0;">
+          <label>لون الخلفية</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="color" id="bgColor" value="#0a0f1e" style="width:44px;height:36px;border-radius:8px;border:1px solid var(--border2);background:none;cursor:pointer;padding:2px;">
+            <input type="text" id="bgColorHex" value="#0a0f1e" style="flex:1;padding:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="form-section">
+      <div class="form-section-title">👁️ معاينة الكشف</div>
+      <div id="brandingPreview" style="border-radius:var(--r2);overflow:hidden;border:1px solid var(--border2);"></div>
+    </div>
+
+    <button class="btn btn-gold" onclick="saveBranding()">💾 حفظ التخصيص</button>
+    <br><br>
+  </div>
+
+  <!-- MAP PAGE -->
+  <div class="page-content fade-in" id="page-map" style="display:none;padding:0;position:relative;">
+    <!-- Map Header -->
+    <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:linear-gradient(180deg,rgba(10,15,30,0.95) 0%,transparent 100%);padding:16px 16px 32px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div class="icon-btn" onclick="showPage('contacts')">←</div>
+        <div style="font-size:18px;font-weight:800;">خريطة الجهات</div>
+        <div style="margin-right:auto;display:flex;gap:8px;">
+          <div class="icon-btn" onclick="locateMe()">📡</div>
+          <div class="icon-btn" onclick="filterMapType()">🔽</div>
+        </div>
+      </div>
+      <!-- Filter chips horizontal scroll -->
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;" id="mapFilterChips">
+        <button class="filter-chip active" onclick="filterMapByType(this,'all')">الكل</button>
+        <button class="filter-chip" onclick="filterMapByType(this,'عميل')">👤 عملاء</button>
+        <button class="filter-chip" onclick="filterMapByType(this,'مورد')">🏭 موردون</button>
+        <button class="filter-chip" onclick="filterMapByType(this,'مندوب')">🚗 مندوبون</button>
+        <button class="filter-chip" onclick="filterMapByType(this,'دائن')">💸 دائنون</button>
+        <button class="filter-chip" onclick="filterMapByType(this,'مدين')">🤝 مدينون</button>
+      </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="mainMapContainer" style="width:100%;height:100vh;"></div>
+
+    <!-- Stats bar at bottom -->
+    <div style="position:absolute;bottom:80px;left:0;right:0;z-index:10;padding:0 16px;">
+      <div id="mapStats" style="background:rgba(10,15,30,0.92);border:1px solid var(--border);border-radius:var(--r2);padding:12px 16px;display:flex;justify-content:space-around;backdrop-filter:blur(16px);">
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:800;" id="mapTotalCount">0</div><div style="font-size:11px;color:var(--text2);">جهة على الخريطة</div></div>
+        <div style="width:1px;background:var(--border2);"></div>
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:800;color:var(--green);" id="mapForCount">0</div><div style="font-size:11px;color:var(--text2);">لي منهم</div></div>
+        <div style="width:1px;background:var(--border2);"></div>
+        <div style="text-align:center;"><div style="font-size:18px;font-weight:800;color:var(--red);" id="mapOnCount">0</div><div style="font-size:11px;color:var(--text2);">علي لهم</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="showPage('home')" id="nav-home">
+      <span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span>
+    </button>
+    <button class="nav-item" onclick="showPage('contacts')" id="nav-contacts">
+      <span class="nav-icon">👥</span><span class="nav-label">جهاتي</span>
+    </button>
+    <button class="nav-item" onclick="showPage('statements')" id="nav-statements">
+      <span class="nav-icon">📑</span><span class="nav-label">الكشوف</span>
+    </button>
+    <button class="nav-item" onclick="showPage('transactions')" id="nav-transactions">
+      <span class="nav-icon">📋</span><span class="nav-label">المعاملات</span>
+    </button>
+    <button class="nav-item" onclick="showPage('settings')" id="nav-settings">
+      <span class="nav-icon">⚙️</span><span class="nav-label">الإعدادات</span>
+    </button>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" style="display:none" onclick="openAddModal()">+</button>
+
+<!-- ADD CONTACT MODAL -->
+<div class="modal-overlay" id="addContactModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="contactModalTitle">إضافة جهة اتصال</div>
+    <div class="field"><label>الاسم الكامل</label><input type="text" id="cName" placeholder="اسم الشخص أو الشركة"></div>
+    <div class="field"><label>رقم الجوال</label><input type="tel" id="cPhone" placeholder="05xxxxxxxx"></div>
+    <div class="field"><label>البريد الإلكتروني (اختياري)</label><input type="email" id="cEmail" placeholder="example@email.com"></div>
+    <div class="field"><label>نوع الجهة</label>
+      <select id="cType">
+        <option value="عميل">👤 عميل</option>
+        <option value="مورد">🏭 مورد</option>
+        <option value="مندوب">🚗 مندوب</option>
+        <option value="دائن">💸 دائن (مسلّف منه)</option>
+        <option value="مدين">🤝 مدين (مسلّف له)</option>
+        <option value="شريك">🤝 شريك</option>
+        <option value="أخرى">📌 أخرى</option>
+      </select>
+    </div>
+
+    <!-- LOCATION FIELD -->
+    <div class="field">
+      <label>📍 الموقع الجغرافي</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input type="text" id="cLocationText" placeholder="اسم الموقع أو العنوان" style="flex:1;">
+        <button type="button" onclick="detectMyLocation()" style="padding:0 14px;background:var(--blue3);border:1px solid var(--blue);border-radius:var(--r3);color:var(--blue);font-size:18px;cursor:pointer;flex-shrink:0;" title="تحديد موقعي الحالي">📡</button>
+        <button type="button" onclick="openMapPicker()" style="padding:0 14px;background:var(--gold3);border:1px solid var(--gold);border-radius:var(--r3);color:var(--gold);font-size:18px;cursor:pointer;flex-shrink:0;" title="اختر من الخريطة">🗺️</button>
+      </div>
+      <div id="cLocationPreview" style="display:none;border-radius:var(--r3);overflow:hidden;border:1px solid var(--border2);height:130px;position:relative;">
+        <div id="cLocationMapThumb" style="width:100%;height:100%;"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:8px 10px;font-size:12px;" id="cLocationLabel"></div>
+        <button onclick="clearLocation()" style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.6);border:none;border-radius:6px;color:#fff;padding:4px 8px;font-size:12px;cursor:pointer;">✕ إزالة</button>
+      </div>
+      <input type="hidden" id="cLat">
+      <input type="hidden" id="cLng">
+    </div>
+
+    <div class="field"><label>ملاحظات</label><textarea id="cNotes" rows="2" placeholder="معلومات إضافية..."></textarea></div>
+    <input type="hidden" id="editContactId">
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('addContactModal')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveContact()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT DETAIL MODAL -->
+<div class="modal-overlay" id="contactDetailModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="text-align:center;margin-bottom:20px;">
+      <div id="cdAvatar" style="width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:0 auto 12px;"></div>
+      <div id="cdName" style="font-size:20px;font-weight:800;"></div>
+      <div id="cdType" style="margin-top:6px;"></div>
+      <div id="cdPhone" style="font-size:14px;color:var(--text2);margin-top:4px;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div class="bal-mini bg-green" style="border-radius:var(--r2);padding:14px;">
+        <div style="font-size:11px;color:var(--green);">لي منه</div>
+        <div id="cdFor" class="green" style="font-size:18px;font-weight:800;margin-top:4px;"></div>
+      </div>
+      <div class="bal-mini bg-red" style="border-radius:var(--r2);padding:14px;">
+        <div style="font-size:11px;color:var(--red);">علي له</div>
+        <div id="cdOn" class="red" style="font-size:18px;font-weight:800;margin-top:4px;"></div>
+      </div>
+    </div>
+    <div class="modal-actions" style="flex-wrap:wrap;gap:8px;">
+      <button class="btn" style="flex:1;background:var(--green2);color:var(--green);border:1px solid rgba(72,187,120,0.3);" onclick="whatsappContact()">واتساب 💬</button>
+      <button class="btn" style="flex:1;background:var(--blue3);color:var(--blue);border:1px solid rgba(99,179,237,0.3);" onclick="callContact()">اتصال 📞</button>
+      <button class="btn" style="flex:1;background:var(--purple2);color:var(--purple);border:1px solid rgba(183,148,244,0.3);" id="cdMapBtn" onclick="openContactMapView()">خريطة 🗺️</button>
+      <button class="btn" style="flex:1;background:var(--gold3);color:var(--gold);border:1px solid rgba(246,201,14,0.3);" onclick="editCurrentContact()">تعديل ✏️</button>
+      <button class="btn btn-danger" style="flex:1;" onclick="deleteCurrentContact()">حذف 🗑️</button>
+    </div>
+  </div>
+</div>
+
+<!-- TX DETAIL MODAL -->
+<div class="modal-overlay" id="txDetailModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="txDetailContent"></div>
+    <div class="modal-actions" style="flex-wrap:wrap;gap:8px;">
+      <button class="btn" style="flex:1;background:var(--green2);color:var(--green);border:1px solid rgba(72,187,120,0.3);" onclick="shareCurrentTx()">مشاركة 📤</button>
+      <button class="btn" style="flex:1;background:var(--gold3);color:var(--gold);border:1px solid rgba(246,201,14,0.3);" onclick="editCurrentTx()">تعديل ✏️</button>
+      <button class="btn btn-danger" style="flex:1;" onclick="deleteCurrentTx()">حذف 🗑️</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">مشاركة</div>
+    <div class="share-options">
+      <div class="share-opt" onclick="shareWhatsApp()">
+        <div class="s-o-icon">💬</div><div class="s-o-label">واتساب</div>
+      </div>
+      <div class="share-opt" onclick="shareSMS()">
+        <div class="s-o-icon">📱</div><div class="s-o-label">رسالة نصية</div>
+      </div>
+      <div class="share-opt" onclick="shareEmail()">
+        <div class="s-o-icon">📧</div><div class="s-o-label">بريد إلكتروني</div>
+      </div>
+      <div class="share-opt" onclick="copyToClipboard()">
+        <div class="s-o-icon">📋</div><div class="s-o-label">نسخ</div>
+      </div>
+      <div class="share-opt" onclick="shareNative()">
+        <div class="s-o-icon">↗️</div><div class="s-o-label">مشاركة</div>
+      </div>
+      <div class="share-opt" onclick="downloadPDF()">
+        <div class="s-o-icon">📄</div><div class="s-o-label">PDF</div>
+      </div>
+    </div>
+    <button class="btn btn-outline" onclick="closeModal('shareModal')">إلغاء</button>
+  </div>
+</div>
+
+<!-- MAP PICKER MODAL -->
+<div class="modal-overlay" id="mapPickerModal">
+  <div class="modal" style="border-radius:0;width:100%;max-width:100%;height:100%;max-height:100%;display:flex;flex-direction:column;padding:0;margin:0;">
+    <div style="padding:14px 16px 10px;background:var(--bg2);border-bottom:1px solid var(--border2);flex-shrink:0;z-index:20;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <button onclick="closeModal('mapPickerModal')" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r3);padding:8px 14px;color:var(--text2);font-family:'Cairo',sans-serif;cursor:pointer;font-size:13px;">إلغاء</button>
+        <div style="font-size:15px;font-weight:800;flex:1;text-align:center;">📍 اختر الموقع</div>
+        <button onclick="confirmMapLocation()" style="background:var(--gold);border:none;border-radius:var(--r3);padding:8px 14px;color:#000;font-family:'Cairo',sans-serif;cursor:pointer;font-size:13px;font-weight:700;">تأكيد ✓</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input id="mapSearchInput" type="text" placeholder="ابحث عن موقع أو مدينة..." style="flex:1;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r3);color:var(--text);font-size:13px;font-family:'Cairo',sans-serif;outline:none;" onkeydown="if(event.key==='Enter')searchMapLocation()">
+        <button onclick="searchMapLocation()" style="padding:0 12px;background:var(--gold3);border:1px solid var(--gold);border-radius:var(--r3);color:var(--gold);font-size:16px;cursor:pointer;">🔍</button>
+        <button onclick="detectPickerLocation()" style="padding:0 12px;background:var(--blue3);border:1px solid var(--blue);border-radius:var(--r3);color:var(--blue);font-size:16px;cursor:pointer;" title="موقعي">📡</button>
+      </div>
+      <div id="mapSearchResults" style="display:none;background:var(--card2);border:1px solid var(--border);border-radius:var(--r3);margin-top:6px;max-height:140px;overflow-y:auto;position:relative;z-index:30;"></div>
+    </div>
+
+    <!-- Map fills remaining space -->
+    <div style="flex:1;position:relative;min-height:0;">
+      <!-- Fixed crosshair in center -->
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);z-index:20;font-size:32px;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6));">📍</div>
+      <div id="mapPickerDiv" style="width:100%;height:100%;position:absolute;inset:0;"></div>
+    </div>
+
+    <div style="padding:10px 16px;background:var(--bg2);border-top:1px solid var(--border2);flex-shrink:0;z-index:20;">
+      <div id="pickerLocationInfo" style="font-size:12px;color:var(--text2);text-align:center;">اسحب الخريطة لاختيار الموقع الدقيق ثم اضغط تأكيد</div>
+      <div id="pickerCoords" style="font-size:11px;color:var(--text3);text-align:center;margin-top:3px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT MAP VIEW MODAL -->
+<div class="modal-overlay" id="contactMapModal">
+  <div class="modal" style="max-height:85vh;">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div style="font-size:16px;font-weight:800;" id="cmTitle">موقع الجهة</div>
+      <div onclick="closeModal('contactMapModal')" style="cursor:pointer;color:var(--text3);font-size:20px;">✕</div>
+    </div>
+    <div id="contactMapDiv" style="width:100%;height:280px;border-radius:var(--r2);overflow:hidden;border:1px solid var(--border2);margin-bottom:14px;"></div>
+    <div id="cmInfo" style="font-size:13px;color:var(--text2);margin-bottom:14px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn" style="flex:1;background:var(--blue3);color:var(--blue);border:1px solid rgba(99,179,237,0.3);" onclick="openInGoogleMaps()">فتح في خرائط Google 🗺️</button>
+      <button class="btn" style="flex:1;background:var(--green2);color:var(--green);border:1px solid rgba(72,187,120,0.3);" onclick="getDirections()">الاتجاهات 🧭</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="profileModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">تعديل البيانات الشخصية</div>
+    <div class="field"><label>الاسم الكامل</label><input type="text" id="editName" placeholder="الاسم الكامل"></div>
+    <div class="field"><label>رقم الجوال</label><input type="tel" id="editPhone" placeholder="05xxxxxxxx"></div>
+    <div class="field"><label>البريد الإلكتروني</label><input type="email" id="editEmail" placeholder="example@email.com"></div>
+    <div class="field"><label>اسم المنشأة / العمل (اختياري)</label><input type="text" id="editBusiness" placeholder="اسم الشركة أو المتجر"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('profileModal')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveProfile()">حفظ التغييرات</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ SEARCHABLE DROPDOWN ENGINE ============
+const typeColors = {
+  'عميل': { bg:'bg-blue', color:'blue', emoji:'👤' },
+  'مورد': { bg:'bg-orange', color:'orange', emoji:'🏭' },
+  'مندوب': { bg:'bg-purple', color:'purple', emoji:'🚗' },
+  'دائن': { bg:'bg-red', color:'red', emoji:'💸' },
+  'مدين': { bg:'bg-green', color:'green', emoji:'🤝' },
+  'شريك': { bg:'bg-gold', color:'gold', emoji:'🤝' },
+  'أخرى': { bg:'', color:'text2', emoji:'📌' }
+};
+
+class SearchableDropdown {
+  constructor(containerId, hiddenInputId, options = {}) {
+    this.containerId = containerId;
+    this.hiddenInputId = hiddenInputId;
+    this.placeholder = options.placeholder || '-- اختر --';
+    this.allowAll = options.allowAll || false;
+    this.allLabel = options.allLabel || 'الكل';
+    this.showBalance = options.showBalance || false;
+    this.onSelect = options.onSelect || null;
+    this.onAddNew = options.onAddNew || null;
+    this.items = [];
+    this.selectedValue = '';
+    this.isOpen = false;
+    this._overlayEl = null;
+  }
+
+  setItems(items) {
+    this.items = items;
+    this.render();
+  }
+
+  setValue(val) {
+    this.selectedValue = val;
+    this._updateTrigger();
+  }
+
+  getValue() { return this.selectedValue; }
+
+  render() {
+    const container = document.getElementById(this.containerId);
+    if (!container) return;
+    container.innerHTML = '';
+    container.className = 'sd-wrap';
+
+    // Trigger button
+    this._triggerEl = document.createElement('div');
+    this._triggerEl.className = 'sd-trigger';
+    this._triggerEl.onclick = (e) => { e.stopPropagation(); this.toggle(); };
+    this._triggerEl.innerHTML = `
+      <div class="sd-trigger-left">
+        <div class="sd-trigger-icon" id="${this.containerId}-ticon" style="display:none"></div>
+        <span class="sd-trigger-text placeholder" id="${this.containerId}-ttext">${this.placeholder}</span>
+      </div>
+      <div class="sd-trigger-right">
+        <span class="sd-clear" id="${this.containerId}-clear" onclick="event.stopPropagation();_sdClear('${this.containerId}')">✕</span>
+        <span class="sd-arrow">▼</span>
+      </div>`;
+    container.appendChild(this._triggerEl);
+
+    this._updateTrigger();
+  }
+
+  toggle() {
+    if (this.isOpen) this.close();
+    else this.open();
+  }
+
+  open() {
+    // Close any other open dropdown first
+    Object.values(_sdInstances).forEach(sd => { if (sd !== this && sd.isOpen) sd.close(); });
+
+    this.isOpen = true;
+    const container = document.getElementById(this.containerId);
+    if (!container) return;
+    this._triggerEl.classList.add('open');
+
+    // Dropdown panel — appended to BODY to escape any overflow:hidden parents
+    this._dropEl = document.createElement('div');
+    this._dropEl.className = 'sd-dropdown';
+    this._dropEl.style.position = 'fixed';
+    this._dropEl.style.zIndex = '9999';
+
+    // Position it under the trigger
+    const rect = this._triggerEl.getBoundingClientRect();
+    this._dropEl.style.width = rect.width + 'px';
+    this._dropEl.style.right = (window.innerWidth - rect.right) + 'px';
+    this._dropEl.style.left = 'auto';
+
+    const spaceBelow = window.innerHeight - rect.bottom - 10;
+    const spaceAbove = rect.top - 10;
+    if (spaceBelow >= 220 || spaceBelow >= spaceAbove) {
+      this._dropEl.style.top = (rect.bottom + 6) + 'px';
+      this._dropEl.style.bottom = 'auto';
+      this._dropEl.style.maxHeight = Math.min(300, spaceBelow) + 'px';
+    } else {
+      this._dropEl.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+      this._dropEl.style.top = 'auto';
+      this._dropEl.style.maxHeight = Math.min(300, spaceAbove) + 'px';
+    }
+
+    // Search bar
+    const sw = document.createElement('div');
+    sw.className = 'sd-search-wrap';
+    sw.innerHTML = `<span class="sd-search-icon">🔍</span><input class="sd-search" placeholder="ابحث عن جهة..." id="${this.containerId}-search" autocomplete="off"><span class="sd-count" id="${this.containerId}-count">${this.items.length}</span>`;
+    this._dropEl.appendChild(sw);
+
+    // List
+    this._listEl = document.createElement('div');
+    this._listEl.className = 'sd-list';
+    this._listEl.style.overflowY = 'auto';
+    this._listEl.style.maxHeight = '200px';
+    this._dropEl.appendChild(this._listEl);
+
+    // Footer
+    if (this.onAddNew) {
+      const footer = document.createElement('div');
+      footer.className = 'sd-footer';
+      footer.innerHTML = `<span class="sd-footer-add" onclick="_sdAddNew('${this.containerId}')">+ إضافة جهة جديدة</span>`;
+      this._dropEl.appendChild(footer);
+    }
+
+    document.body.appendChild(this._dropEl);
+
+    // Render list
+    this._renderList('');
+
+    // Search input event
+    const searchInput = document.getElementById(`${this.containerId}-search`);
+    if (searchInput) {
+      searchInput.addEventListener('input', e => this._renderList(e.target.value));
+      // Stop scroll events from bubbling
+      this._listEl.addEventListener('touchmove', e => e.stopPropagation(), { passive: true });
+      setTimeout(() => searchInput.focus(), 60);
+    }
+
+    // Close on outside click — slight delay so this open-click doesn't immediately close
+    this._docHandler = (e) => {
+      if (!this._dropEl) return;
+      if (this._dropEl.contains(e.target)) return;
+      if (this._triggerEl.contains(e.target)) return;
+      this.close();
+    };
+    setTimeout(() => document.addEventListener('click', this._docHandler), 100);
+  }
+
+  close() {
+    this.isOpen = false;
+    if (this._docHandler) { document.removeEventListener('click', this._docHandler); this._docHandler = null; }
+    if (this._triggerEl) this._triggerEl.classList.remove('open');
+    if (this._dropEl) { this._dropEl.remove(); this._dropEl = null; }
+    this._listEl = null;
+  }
+
+  _renderList(q) {
+    if (!this._listEl) return;
+    const query = q.trim().toLowerCase();
+
+    let filtered = this.items.filter(item => {
+      if (!query) return true;
+      return (item.name||'').toLowerCase().includes(query) ||
+             (item.phone||'').includes(query) ||
+             (item.type||'').includes(query);
+    });
+
+    const countEl = document.getElementById(`${this.containerId}-count`);
+    if (countEl) countEl.textContent = filtered.length;
+
+    this._listEl.innerHTML = '';
+
+    // "All" option
+    if (this.allowAll) {
+      const el = this._makeOption('', this.allLabel, '', '🌐', 'عرض جميع الجهات', this.selectedValue === '');
+      this._listEl.appendChild(el);
+      const div = document.createElement('div');
+      div.className = 'sd-divider';
+      this._listEl.appendChild(div);
+    }
+
+    if (!filtered.length) {
+      const empty = document.createElement('div');
+      empty.className = 'sd-empty';
+      empty.innerHTML = `<div class="sd-empty-icon">🔍</div><div class="sd-empty-text">لا توجد نتائج${query ? ' لـ "'+query+'"' : ''}</div>`;
+      this._listEl.appendChild(empty);
+      return;
+    }
+
+    // Group by type
+    const groups = {};
+    filtered.forEach(item => {
+      const g = item.type || 'أخرى';
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(item);
+    });
+
+    const multiGroup = Object.keys(groups).length > 1;
+
+    Object.entries(groups).forEach(([type, items]) => {
+      const tc = typeColors[type] || typeColors['أخرى'];
+      if (multiGroup) {
+        const gl = document.createElement('div');
+        gl.className = 'sd-group-label';
+        gl.textContent = `${tc.emoji} ${type} (${items.length})`;
+        this._listEl.appendChild(gl);
+      }
+      items.forEach(item => {
+        const bal = this.showBalance && item.value ? getContactBalance(item.value) : null;
+        const el = this._makeOption(item.value, item.name, item.type, tc.emoji, item.phone||'', this.selectedValue === item.value, bal, query);
+        this._listEl.appendChild(el);
+      });
+    });
+  }
+
+  _makeOption(value, name, type, emoji, sub, selected, bal, query) {
+    const tc = typeColors[type] || typeColors['أخرى'];
+    const div = document.createElement('div');
+    div.className = 'sd-option' + (selected ? ' selected' : '');
+
+    let nameDisplay = name;
+    if (query) {
+      const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+      nameDisplay = name.replace(re, '<span class="sd-highlight">$1</span>');
+    }
+
+    let balHtml = '';
+    if (bal) {
+      const cls = bal.net >= 0 ? 'green' : 'red';
+      balHtml = `<span class="sd-opt-balance ${cls}">${bal.net >= 0 ? '+' : ''}${Math.abs(bal.net).toFixed(0)}</span>`;
+    }
+
+    let badgeHtml = type ? `<span class="sd-opt-badge ${tc.bg}" style="color:var(--${tc.color})">${type}</span>` : '';
+
+    div.innerHTML = `
+      <div class="sd-opt-avatar ${value ? tc.bg : ''}" style="${value ? 'color:var(--'+tc.color+')' : 'background:var(--bg3)'}">${emoji}</div>
+      <div class="sd-opt-info">
+        <div class="sd-opt-name">${nameDisplay}</div>
+        <div class="sd-opt-sub">${badgeHtml}${sub ? ' · '+sub : ''}</div>
+      </div>
+      ${balHtml}
+      <span class="sd-opt-check">✓</span>`;
+
+    // Use mousedown (fires before blur) for reliable mobile+desktop selection
+    div.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); this._select(value, name); });
+    div.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); this._select(value, name); });
+
+    return div;
+  }
+
+  _select(value, name) {
+    this.selectedValue = value;
+    this._updateTrigger();
+    this.close();
+    if (this.onSelect) this.onSelect(value, name);
+  }
+
+  _updateTrigger() {
+    const ttext = document.getElementById(`${this.containerId}-ttext`);
+    const ticon = document.getElementById(`${this.containerId}-ticon`);
+    const tclear = document.getElementById(`${this.containerId}-clear`);
+
+    if (this.selectedValue === '' || this.selectedValue === null) {
+      if (ttext) { ttext.textContent = this.placeholder; ttext.className = 'sd-trigger-text placeholder'; }
+      if (ticon) ticon.style.display = 'none';
+      if (tclear) tclear.style.display = 'none';
+    } else {
+      const item = this.items.find(i => i.value === this.selectedValue);
+      if (item) {
+        const tc = typeColors[item.type] || typeColors['أخرى'];
+        if (ttext) { ttext.textContent = item.name; ttext.className = 'sd-trigger-text'; }
+        if (ticon) {
+          ticon.style.display = 'flex';
+          ticon.textContent = tc.emoji;
+          ticon.className = `sd-trigger-icon ${tc.bg}`;
+          ticon.style.color = `var(--${tc.color})`;
+        }
+        if (tclear) tclear.style.display = 'inline';
+      } else if (this.allowAll && this.selectedValue === '') {
+        if (ttext) { ttext.textContent = this.allLabel; ttext.className = 'sd-trigger-text'; }
+      }
+    }
+
+    // Sync hidden input
+    const hidden = document.getElementById(this.hiddenInputId);
+    if (hidden) hidden.value = this.selectedValue;
+  }
+}
+
+// Global SD registry
+const _sdInstances = {};
+
+function _sdClear(containerId) {
+  const sd = _sdInstances[containerId];
+  if (!sd) return;
+  sd._select('', '');
+}
+
+function _sdAddNew(containerId) {
+  const sd = _sdInstances[containerId];
+  if (!sd) return;
+  sd.close();
+  if (sd.onAddNew) sd.onAddNew();
+}
+
+function initSearchableDropdowns() {
+  // txContact dropdown (in add/edit transaction)
+  const sdTx = new SearchableDropdown('sd-txContact', 'txContact', {
+    placeholder: '-- ابحث واختر جهة --',
+    showBalance: true,
+    onAddNew: () => { showPage('contacts'); showAddContact(); }
+  });
+  _sdInstances['sd-txContact'] = sdTx;
+  sdTx.render();
+
+  // stContact dropdown (in statements)
+  const sdSt = new SearchableDropdown('sd-stContact', 'stContact', {
+    placeholder: 'الكل (جميع الجهات)',
+    allowAll: true,
+    allLabel: 'الكل',
+    showBalance: false,
+  });
+  _sdInstances['sd-stContact'] = sdSt;
+  sdSt.render();
+
+  refreshDropdownItems();
+}
+
+function refreshDropdownItems() {
+  const items = DB.contacts.map(c => ({
+    value: c.id,
+    name: c.name,
+    phone: c.phone || '',
+    type: c.type || 'أخرى'
+  }));
+
+  if (_sdInstances['sd-txContact']) _sdInstances['sd-txContact'].setItems(items);
+  if (_sdInstances['sd-stContact']) _sdInstances['sd-stContact'].setItems(items);
+}
+
+// ============ DATA ============
+let DB = {
+  user: null,
+  contacts: [],
+  transactions: [],
+  notifications: [],
+  settings: { currency: 'ر.س', notif: true, dark: true }
+};
+
+let currentContactId = null;
+let currentTxId = null;
+let shareText = '';
+let txTypeFilter = 'all';
+let contactTypeFilter = 'all';
+
+// ============ INIT ============
+window.onload = () => {
+  setDate();
+  loadDB();
+  setTimeout(() => {
+    document.getElementById('splash').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('splash').classList.remove('active');
+      if (DB.user) {
+        startApp();
+      } else {
+        document.getElementById('login').classList.add('active');
+      }
+    }, 500);
+  }, 2400);
+};
+
+function setDate() {
+  const d = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  const el = document.getElementById('todayDate');
+  if (el) el.textContent = d.toLocaleDateString('ar-SA', opts);
+  const today = d.toISOString().split('T')[0];
+  const txDate = document.getElementById('txDate');
+  if (txDate) txDate.value = today;
+}
+
+function loadDB() {
+  const saved = localStorage.getItem('hesabi_db');
+  if (saved) {
+    try { DB = JSON.parse(saved); } catch(e) {}
+  }
+  // Demo data if fresh
+  if (!DB.contacts) DB.contacts = [];
+  if (!DB.transactions) DB.transactions = [];
+  if (!DB.notifications) DB.notifications = [];
+  if (!DB.settings) DB.settings = { currency: 'ر.س', notif: true, dark: true };
+}
+
+function saveDB() {
+  localStorage.setItem('hesabi_db', JSON.stringify(DB));
+}
+
+function startApp() {
+  document.getElementById('app').classList.add('active');
+  document.getElementById('fabBtn').style.display = 'flex';
+  updateHeaderUser();
+  applyDarkMode();
+  initSearchableDropdowns();
+  applyTerminology();
+  applyDashboardSettings();
+  renderAll();
+  showPage('home');
+  generateNotifications();
+}
+
+function updateHeaderUser() {
+  if (!DB.user) return;
+  const name = DB.user.name || 'مستخدم';
+  const initials = name.charAt(0);
+  document.getElementById('userAvatar').textContent = initials;
+  document.getElementById('welcomeName').textContent = name;
+  document.getElementById('settingsName').textContent = name;
+  document.getElementById('settingsAvatar').textContent = initials;
+  document.getElementById('settingsPhone').textContent = DB.user.phone || '';
+  document.getElementById('settingsEmail').textContent = DB.user.email || 'user@hesabi.app';
+}
+
+// ============ AUTH ============
+function switchLoginTab(tab) {
+  document.querySelectorAll('.l-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+function doLogin() {
+  const phone = document.getElementById('loginPhone').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (!phone || !pass) { showToast('يرجى إدخال الجوال وكلمة المرور', 'error'); return; }
+  // Check saved user
+  const saved = localStorage.getItem('hesabi_user_' + phone);
+  if (saved) {
+    const u = JSON.parse(saved);
+    if (u.pass !== pass) { showToast('كلمة المرور غير صحيحة', 'error'); return; }
+    DB.user = u;
+  } else {
+    DB.user = { name: 'محمد أحمد', phone, email: '', pass, business: '' };
+    localStorage.setItem('hesabi_user_' + phone, JSON.stringify(DB.user));
+  }
+  saveDB();
+  document.getElementById('login').classList.remove('active');
+  startApp();
+  showToast('مرحباً بك في حسابي 👋', 'success');
+}
+
+function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const pass2 = document.getElementById('regPass2').value;
+  if (!name || !phone || !pass) { showToast('يرجى تعبئة جميع الحقول', 'error'); return; }
+  if (pass !== pass2) { showToast('كلمتا المرور غير متطابقتين', 'error'); return; }
+  if (pass.length < 6) { showToast('كلمة المرور قصيرة جداً', 'error'); return; }
+  DB.user = { name, phone, email: '', pass, business: '' };
+  localStorage.setItem('hesabi_user_' + phone, JSON.stringify(DB.user));
+  // OTP simulation
+  document.getElementById('loginPanel').style.display = 'none';
+  document.getElementById('otpPanel').style.display = 'block';
+  showToast('تم إرسال رمز التحقق 1234 (تجريبي)', 'success');
+}
+
+function showOTP() {
+  document.getElementById('loginPanel').style.display = 'none';
+  document.getElementById('otpPanel').style.display = 'block';
+}
+
+function backToLogin() {
+  document.getElementById('loginPanel').style.display = 'block';
+  document.getElementById('otpPanel').style.display = 'none';
+}
+
+function otpNext(el, i) {
+  if (el.value.length === 1 && i < 3) {
+    document.getElementById('otp' + (i+1)).focus();
+  }
+}
+
+function verifyOTP() {
+  const code = ['otp0','otp1','otp2','otp3'].map(id => document.getElementById(id).value).join('');
+  if (code === '1234' || code.length === 4) {
+    saveDB();
+    document.getElementById('login').classList.remove('active');
+    startApp();
+    showToast('تم التحقق بنجاح ✅', 'success');
+  } else {
+    showToast('رمز التحقق غير صحيح', 'error');
+  }
+}
+
+function doLogout() {
+  if (!confirm('هل أنت متأكد من تسجيل الخروج؟')) return;
+  DB.user = null;
+  saveDB();
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('fabBtn').style.display = 'none';
+  document.getElementById('login').classList.add('active');
+  showToast('تم تسجيل الخروج', 'success');
+}
+
+// ============ NAVIGATION ============
+const NAV_PAGES = ['home','contacts','transactions','reports','settings'];
+
+function showPage(page) {
+  document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+  const el = document.getElementById('page-' + page);
+  if (el) { el.style.display = 'block'; el.classList.add('fade-in'); }
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+
+  // Show/hide FAB
+  const fabPages = ['home','contacts','transactions'];
+  document.getElementById('fabBtn').style.display = fabPages.includes(page) ? 'flex' : 'none';
+
+  // Refresh data on page open
+  if (page === 'home') renderHome();
+  if (page === 'contacts') renderContacts();
+  if (page === 'transactions') renderTransactions();
+  if (page === 'reports') renderReports();
+  if (page === 'reminders') renderReminders();
+  if (page === 'notifications') renderNotifications();
+  if (page === 'statements') { populateStContactDropdown(); resetStFilters(); }
+  if (page === 'branding') initBranding();
+  if (page === 'terminology') initTerminologyPage();
+  if (page === 'dashboard-settings') initDashboardSettings();
+}
+
+// ============ CONTACTS ============
+
+function showAddContact(id) {
+  document.getElementById('editContactId').value = id || '';
+  if (id) {
+    const c = DB.contacts.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('cName').value = c.name;
+    document.getElementById('cPhone').value = c.phone;
+    document.getElementById('cEmail').value = c.email || '';
+    document.getElementById('cType').value = c.type;
+    document.getElementById('cNotes').value = c.notes || '';
+    document.getElementById('cLat').value = c.lat || '';
+    document.getElementById('cLng').value = c.lng || '';
+    document.getElementById('cLocationText').value = c.locationText || '';
+    document.getElementById('contactModalTitle').textContent = 'تعديل جهة الاتصال';
+    if (c.lat && c.lng) showLocationPreview(c.lat, c.lng, c.locationText || '');
+    else hideLocationPreview();
+  } else {
+    document.getElementById('cName').value = '';
+    document.getElementById('cPhone').value = '';
+    document.getElementById('cEmail').value = '';
+    document.getElementById('cType').value = 'عميل';
+    document.getElementById('cNotes').value = '';
+    document.getElementById('cLat').value = '';
+    document.getElementById('cLng').value = '';
+    document.getElementById('cLocationText').value = '';
+    document.getElementById('contactModalTitle').textContent = 'إضافة جهة اتصال';
+    hideLocationPreview();
+  }
+  openModal('addContactModal');
+}
+
+function saveContact() {
+  const name = document.getElementById('cName').value.trim();
+  const phone = document.getElementById('cPhone').value.trim();
+  const type = document.getElementById('cType').value;
+  const email = document.getElementById('cEmail').value.trim();
+  const notes = document.getElementById('cNotes').value.trim();
+  const lat = parseFloat(document.getElementById('cLat').value) || null;
+  const lng = parseFloat(document.getElementById('cLng').value) || null;
+  const locationText = document.getElementById('cLocationText').value.trim();
+  const editId = document.getElementById('editContactId').value;
+
+  if (!name) { showToast('يرجى إدخال الاسم', 'error'); return; }
+
+  if (editId) {
+    const idx = DB.contacts.findIndex(c => c.id === editId);
+    if (idx >= 0) Object.assign(DB.contacts[idx], { name, phone, type, email, notes, lat, lng, locationText });
+  } else {
+    DB.contacts.push({ id: uid(), name, phone, type, email, notes, lat, lng, locationText, createdAt: Date.now() });
+    addNotif('جهة جديدة', `تمت إضافة ${name} كـ${type}`, '👤');
+  }
+
+  saveDB();
+  closeModal('addContactModal');
+  renderContacts();
+  refreshDropdownItems();
+  renderHome();
+  showToast('تم الحفظ بنجاح ✅', 'success');
+}
+
+function renderContacts() {
+  const list = document.getElementById('contactsList');
+  if (!list) return;
+  let contacts = DB.contacts.filter(c => {
+    const q = (document.getElementById('contactSearch')?.value || '').toLowerCase();
+    const typeMatch = contactTypeFilter === 'all' || c.type === contactTypeFilter;
+    const nameMatch = !q || c.name.toLowerCase().includes(q) || (c.phone && c.phone.includes(q));
+    return typeMatch && nameMatch;
+  });
+
+  if (!contacts.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">لا توجد جهات اتصال</div><div class="empty-sub">أضف جهاتك الآن</div></div>`;
+    return;
+  }
+
+  list.innerHTML = contacts.map(c => {
+    const tc = typeColors[c.type] || typeColors['أخرى'];
+    const bal = getContactBalance(c.id);
+    const balColor = bal.net >= 0 ? 'green' : 'red';
+    const balLabel = bal.net >= 0 ? 'لي منه' : 'علي له';
+    const hasLoc = c.lat && c.lng;
+    return `<div class="contact-card" onclick="openContactDetail('${c.id}')">
+      <div class="contact-top">
+        <div class="contact-avatar ${tc.bg}" style="color:var(--${tc.color})">${tc.emoji}</div>
+        <div class="contact-info">
+          <div class="contact-name">${c.name}</div>
+          <span class="contact-type ${tc.bg}" style="color:var(--${tc.color})">${c.type}</span>
+          <div class="contact-phone">${c.phone || 'بدون رقم'}${hasLoc ? ' <span style="color:var(--gold);font-size:11px;">📍</span>' : ''}</div>
+          ${c.locationText ? `<div style="font-size:11px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;">📍 ${c.locationText}</div>` : ''}
+        </div>
+        <div class="contact-balance">
+          <div class="contact-balance-amount ${balColor}">${Math.abs(bal.net).toFixed(0)} ${DB.settings.currency}</div>
+          <div class="contact-balance-label">${balLabel}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterContacts() { renderContacts(); }
+function filterByType(el, type) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  contactTypeFilter = type;
+  renderContacts();
+}
+
+function getContactBalance(cid) {
+  const txs = DB.transactions.filter(t => t.contactId === cid && t.status !== 'settled');
+  let forMe = 0, onMe = 0;
+  txs.forEach(t => {
+    if (t.type === 'incoming') forMe += parseFloat(t.amount) || 0;
+    else onMe += parseFloat(t.amount) || 0;
+  });
+  return { forMe, onMe, net: forMe - onMe };
+}
+
+function openContactDetail(id) {
+  currentContactId = id;
+  const c = DB.contacts.find(x => x.id === id);
+  if (!c) return;
+  const tc = typeColors[c.type] || typeColors['أخرى'];
+  const bal = getContactBalance(id);
+  document.getElementById('cdAvatar').className = `${tc.bg}`;
+  document.getElementById('cdAvatar').style = `width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:0 auto 12px;`;
+  document.getElementById('cdAvatar').textContent = tc.emoji;
+  document.getElementById('cdName').textContent = c.name;
+  document.getElementById('cdType').innerHTML = `<span class="contact-type ${tc.bg}" style="color:var(--${tc.color})">${c.type}</span>`;
+  document.getElementById('cdPhone').textContent = c.phone || 'بدون رقم';
+  document.getElementById('cdFor').textContent = `${bal.forMe.toFixed(2)} ${DB.settings.currency}`;
+  document.getElementById('cdOn').textContent = `${bal.onMe.toFixed(2)} ${DB.settings.currency}`;
+  openModal('contactDetailModal');
+}
+
+function editCurrentContact() {
+  closeModal('contactDetailModal');
+  showAddContact(currentContactId);
+}
+
+function deleteCurrentContact() {
+  if (!confirm('حذف هذه الجهة؟ ستحذف معاملاتها أيضاً.')) return;
+  DB.contacts = DB.contacts.filter(c => c.id !== currentContactId);
+  DB.transactions = DB.transactions.filter(t => t.contactId !== currentContactId);
+  saveDB();
+  closeModal('contactDetailModal');
+  renderContacts();
+  renderHome();
+  showToast('تم الحذف', 'success');
+}
+
+function whatsappContact() {
+  const c = DB.contacts.find(x => x.id === currentContactId);
+  if (!c || !c.phone) { showToast('لا يوجد رقم جوال', 'error'); return; }
+  const bal = getContactBalance(c.id);
+  const msg = encodeURIComponent(`مرحباً ${c.name}،\nحسب سجلاتي لديك رصيد: ${Math.abs(bal.net).toFixed(2)} ${DB.settings.currency}\n\nشكراً - تطبيق حسابي`);
+  window.open(`https://wa.me/${c.phone.replace(/^0/, '966')}?text=${msg}`, '_blank');
+}
+
+function callContact() {
+  const c = DB.contacts.find(x => x.id === currentContactId);
+  if (!c || !c.phone) { showToast('لا يوجد رقم جوال', 'error'); return; }
+  window.location.href = `tel:${c.phone}`;
+}
+
+// ============ TRANSACTIONS ============
+function openAddModal(type) {
+  showPage('add');
+  document.getElementById('editTxId').value = '';
+  document.getElementById('addFormTitle').textContent = 'إضافة معاملة';
+  if (type) document.getElementById('txType').value = type;
+  document.getElementById('txAmount').value = '';
+  document.getElementById('txNotes').value = '';
+  document.getElementById('txStatus').value = 'pending';
+  document.getElementById('photosPreview').innerHTML = '';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('txDate').value = today;
+  document.getElementById('txDueDate').value = '';
+  // Reset searchable dropdown
+  if (_sdInstances['sd-txContact']) {
+    _sdInstances['sd-txContact'].setValue('');
+  }
+}
+
+function populateTxContactDropdown() {
+  refreshDropdownItems();
+}
+
+function saveTx() {
+  const contactId = document.getElementById('txContact').value;
+  const amount = parseFloat(document.getElementById('txAmount').value);
+  const type = document.getElementById('txType').value;
+  const currency = document.getElementById('txCurrency').value;
+  const date = document.getElementById('txDate').value;
+  const dueDate = document.getElementById('txDueDate').value;
+  const notes = document.getElementById('txNotes').value.trim();
+  const status = document.getElementById('txStatus').value;
+  const reminder = document.getElementById('reminderType').value;
+  const editId = document.getElementById('editTxId').value;
+
+  if (!contactId) { showToast('يرجى اختيار الجهة', 'error'); return; }
+  if (!amount || amount <= 0) { showToast('يرجى إدخال مبلغ صحيح', 'error'); return; }
+
+  const contact = DB.contacts.find(c => c.id === contactId);
+  const tx = { id: editId || uid(), contactId, contactName: contact?.name || '', amount, currency, type, date, dueDate, notes, status, reminder, createdAt: Date.now() };
+
+  if (editId) {
+    const idx = DB.transactions.findIndex(t => t.id === editId);
+    if (idx >= 0) DB.transactions[idx] = tx;
+  } else {
+    DB.transactions.unshift(tx);
+    const typeLabel = type === 'incoming' ? 'لي من' : 'علي من';
+    addNotif('معاملة جديدة', `${typeLabel} ${contact?.name}: ${amount} ${currency}`, type === 'incoming' ? '📥' : '📤');
+  }
+
+  saveDB();
+  showPage('transactions');
+  renderAll();
+  showToast('تم حفظ المعاملة ✅', 'success');
+}
+
+function renderTransactions() {
+  const list = document.getElementById('txList');
+  if (!list) return;
+  const q = (document.getElementById('txSearch')?.value || '').toLowerCase();
+  let txs = DB.transactions.filter(t => {
+    const typeMatch = txTypeFilter === 'all' || t.type === txTypeFilter || (txTypeFilter === 'settled' && t.status === 'settled');
+    const nameMatch = !q || t.contactName.toLowerCase().includes(q) || (t.notes && t.notes.toLowerCase().includes(q));
+    return typeMatch && nameMatch;
+  });
+
+  if (!txs.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">لا توجد معاملات</div><div class="empty-sub">أضف معاملتك الأولى</div></div>`;
+    return;
+  }
+
+  list.innerHTML = txs.map(t => {
+    const isIn = t.type === 'incoming';
+    const color = t.status === 'settled' ? 'text3' : isIn ? 'green' : 'red';
+    const icon = isIn ? '📥' : '📤';
+    const bgClass = t.status === 'settled' ? '' : isIn ? 'bg-green' : 'bg-red';
+    const statusLabel = { pending: '🕐 معلقة', partial: '🔄 جزئي', settled: '✅ مسوّاة' }[t.status] || '';
+    return `<div class="tx-item" onclick="openTxDetail('${t.id}')">
+      <div class="tx-top">
+        <div class="tx-icon ${bgClass}">${icon}</div>
+        <div class="tx-info">
+          <div class="tx-name">${t.contactName}</div>
+          <div class="tx-sub">${t.notes || (isIn ? 'مستحق لي' : 'مستحق علي')}</div>
+        </div>
+        <div>
+          <div class="tx-amount ${color}">${isIn ? '+' : '-'}${t.amount} ${t.currency}</div>
+          <div class="tx-date">${formatDate(t.date)}</div>
+        </div>
+      </div>
+      <div class="tx-tags">
+        <span class="tag ${bgClass}" style="color:var(--${isIn?'green':'red'})">${isIn ? 'لي' : 'علي'}</span>
+        <span class="tag" style="background:var(--bg3);color:var(--text2)">${statusLabel}</span>
+        ${t.dueDate ? `<span class="tag" style="background:var(--orange2);color:var(--orange)">يستحق: ${formatDate(t.dueDate)}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterTx() { renderTransactions(); }
+function filterTxType(el, type) {
+  document.querySelectorAll('#txFilters .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  txTypeFilter = type;
+  renderTransactions();
+}
+
+function openTxDetail(id) {
+  currentTxId = id;
+  const t = DB.transactions.find(x => x.id === id);
+  if (!t) return;
+  const isIn = t.type === 'incoming';
+  const color = isIn ? 'green' : 'red';
+  const statusLabel = { pending: '🕐 معلقة', partial: '🔄 مدفوعة جزئياً', settled: '✅ مسوّاة' }[t.status] || '';
+  document.getElementById('txDetailContent').innerHTML = `
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:48px;">${isIn ? '📥' : '📤'}</div>
+      <div style="font-size:28px;font-weight:900;color:var(--${color});margin:10px 0;">${isIn?'+':'-'}${t.amount} ${t.currency}</div>
+      <div style="font-size:16px;font-weight:700;">${t.contactName}</div>
+      <div style="margin-top:8px;">${statusLabel}</div>
+    </div>
+    <div class="card2" style="margin-bottom:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">
+        <div><div style="color:var(--text3);margin-bottom:3px;">النوع</div><div style="font-weight:600;">${isIn ? 'لي 📥' : 'علي 📤'}</div></div>
+        <div><div style="color:var(--text3);margin-bottom:3px;">التاريخ</div><div style="font-weight:600;">${formatDate(t.date)}</div></div>
+        ${t.dueDate ? `<div><div style="color:var(--text3);margin-bottom:3px;">تاريخ الاستحقاق</div><div style="font-weight:600;">${formatDate(t.dueDate)}</div></div>` : ''}
+        <div><div style="color:var(--text3);margin-bottom:3px;">العملة</div><div style="font-weight:600;">${t.currency}</div></div>
+      </div>
+    </div>
+    ${t.notes ? `<div class="card2" style="margin-bottom:10px;font-size:14px;"><div style="color:var(--text3);margin-bottom:6px;font-size:12px;">ملاحظات</div>${t.notes}</div>` : ''}
+  `;
+  openModal('txDetailModal');
+}
+
+function editCurrentTx() {
+  const t = DB.transactions.find(x => x.id === currentTxId);
+  if (!t) return;
+  closeModal('txDetailModal');
+  showPage('add');
+  document.getElementById('addFormTitle').textContent = 'تعديل المعاملة';
+  document.getElementById('editTxId').value = t.id;
+  if (_sdInstances['sd-txContact']) _sdInstances['sd-txContact'].setValue(t.contactId);
+  document.getElementById('txAmount').value = t.amount;
+  document.getElementById('txCurrency').value = t.currency;
+  document.getElementById('txType').value = t.type;
+  document.getElementById('txDate').value = t.date;
+  document.getElementById('txDueDate').value = t.dueDate || '';
+  document.getElementById('txNotes').value = t.notes || '';
+  document.getElementById('txStatus').value = t.status;
+}
+
+function deleteCurrentTx() {
+  if (!confirm('حذف هذه المعاملة؟')) return;
+  DB.transactions = DB.transactions.filter(t => t.id !== currentTxId);
+  saveDB();
+  closeModal('txDetailModal');
+  renderAll();
+  showToast('تم الحذف', 'success');
+}
+
+function shareCurrentTx() {
+  const t = DB.transactions.find(x => x.id === currentTxId);
+  if (!t) return;
+  const isIn = t.type === 'incoming';
+  shareText = `📊 تفاصيل المعاملة\n\nالجهة: ${t.contactName}\nالنوع: ${isIn ? 'مستحق لي' : 'مستحق علي'}\nالمبلغ: ${t.amount} ${t.currency}\nالتاريخ: ${formatDate(t.date)}\n${t.notes ? 'ملاحظات: ' + t.notes : ''}\n\nتطبيق حسابي 💰`;
+  closeModal('txDetailModal');
+  openModal('shareModal');
+}
+
+// ============ HOME ============
+function renderHome() {
+  let forMe = 0, onMe = 0, settled = 0;
+  DB.transactions.forEach(t => {
+    if (t.status === 'settled') { settled++; return; }
+    if (t.type === 'incoming') forMe += parseFloat(t.amount) || 0;
+    else onMe += parseFloat(t.amount) || 0;
+  });
+  const net = forMe - onMe;
+  const cur = DB.settings.currency;
+
+  const balEl = document.getElementById('totalBalance');
+  if (balEl) {
+    balEl.textContent = `${net >= 0 ? '+' : ''}${net.toFixed(2)} ${cur}`;
+    balEl.className = 'balance-amount ' + (net > 0 ? 'positive' : net < 0 ? 'negative' : 'zero');
+  }
+  setText('totalFor', `${forMe.toFixed(2)} ${cur}`);
+  setText('totalOn', `${onMe.toFixed(2)} ${cur}`);
+  setText('contactsCount', DB.contacts.length);
+  setText('txCount', DB.transactions.length);
+  setText('settledCount', settled);
+  setText('remindersCount', DB.transactions.filter(t => t.reminder && t.reminder !== 'none' && t.status !== 'settled').length);
+
+  // Recent
+  const recentList = document.getElementById('recentList');
+  if (recentList) {
+    const recent = DB.transactions.slice(0, 5);
+    if (!recent.length) {
+      recentList.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">لا توجد معاملات بعد</div><div class="empty-sub">ابدأ بإضافة معاملة جديدة</div></div>`;
+    } else {
+      recentList.innerHTML = recent.map(t => {
+        const isIn = t.type === 'incoming';
+        return `<div class="activity-item" onclick="openTxDetail('${t.id}')">
+          <div class="activity-icon ${isIn ? 'bg-green' : 'bg-red'}">${isIn ? '📥' : '📤'}</div>
+          <div class="activity-info">
+            <div class="activity-name">${t.contactName}</div>
+            <div class="activity-sub">${t.notes || (isIn ? 'مستحق لي' : 'مستحق علي')}</div>
+          </div>
+          <div>
+            <div class="activity-amount ${isIn ? 'green' : 'red'}">${isIn ? '+' : '-'}${t.amount} ${t.currency}</div>
+            <div class="activity-date">${formatDate(t.date)}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
+// ============ REPORTS ============
+function renderReports() {
+  let forMe = 0, onMe = 0, settled = 0;
+  DB.transactions.forEach(t => {
+    if (t.status === 'settled') settled++;
+    else if (t.type === 'incoming') forMe += parseFloat(t.amount) || 0;
+    else onMe += parseFloat(t.amount) || 0;
+  });
+  const cur = DB.settings.currency;
+  setText('rptFor', `${forMe.toFixed(0)} ${cur}`);
+  setText('rptOn', `${onMe.toFixed(0)} ${cur}`);
+  setText('rptSettled', settled);
+  const net = forMe - onMe;
+  const rptNet = document.getElementById('rptNet');
+  if (rptNet) { rptNet.textContent = `${net >= 0 ? '+' : ''}${net.toFixed(0)} ${cur}`; rptNet.className = net >= 0 ? 'gold' : 'red'; }
+
+  // Monthly Chart
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const now = new Date();
+  const monthData = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const sum = DB.transactions.filter(t => t.date && t.date.startsWith(key)).reduce((s,t) => s + (parseFloat(t.amount)||0), 0);
+    monthData.push({ label: months[d.getMonth()].slice(0,3), val: sum });
+  }
+  const maxVal = Math.max(...monthData.map(m => m.val), 1);
+  const chart = document.getElementById('monthlyChart');
+  if (chart) {
+    chart.innerHTML = monthData.map(m => `
+      <div class="bar-wrap">
+        <div class="bar" style="height:${Math.max((m.val/maxVal)*100,2)}%;background:linear-gradient(180deg,var(--gold),var(--gold2));"></div>
+        <div class="bar-label">${m.label}</div>
+      </div>`).join('');
+  }
+
+  // Pie
+  const typeCount = {};
+  DB.contacts.forEach(c => { typeCount[c.type] = (typeCount[c.type] || 0) + 1; });
+  const colors = [var_('--green'), var_('--red'), var_('--blue'), var_('--gold'), var_('--purple'), var_('--orange')];
+  const legend = document.getElementById('pieLegend');
+  if (legend) {
+    legend.innerHTML = Object.entries(typeCount).map(([ type, cnt], i) => `
+      <div class="legend-item"><div class="legend-dot" style="background:${colors[i%colors.length]}"></div>${type}: ${cnt}</div>`).join('');
+  }
+
+  // Top balances
+  const top = document.getElementById('topBalances');
+  if (top) {
+    const sorted = DB.contacts.map(c => ({ ...c, bal: getContactBalance(c.id) })).sort((a,b) => Math.abs(b.bal.net) - Math.abs(a.bal.net)).slice(0,5);
+    top.innerHTML = sorted.map(c => {
+      const tc = typeColors[c.type] || typeColors['أخرى'];
+      const isPos = c.bal.net >= 0;
+      return `<div class="activity-item">
+        <div class="activity-icon ${tc.bg}">${tc.emoji}</div>
+        <div class="activity-info"><div class="activity-name">${c.name}</div><div class="activity-sub">${c.type}</div></div>
+        <div class="activity-amount ${isPos ? 'green' : 'red'}">${Math.abs(c.bal.net).toFixed(0)} ${cur}</div>
+      </div>`;
+    }).join('') || `<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">لا توجد بيانات كافية</div></div>`;
+  }
+}
+
+// ============ REMINDERS ============
+function renderReminders() {
+  const list = document.getElementById('remindersList');
+  if (!list) return;
+  const txs = DB.transactions.filter(t => t.reminder && t.reminder !== 'none' && t.status !== 'settled');
+  if (!txs.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">⏰</div><div class="empty-title">لا توجد تذكيرات</div><div class="empty-sub">أضف تذكيراً عند إنشاء معاملة</div></div>`;
+    return;
+  }
+  const reminderLabels = { duedate: 'عند الاستحقاق', '3days': 'قبل 3 أيام', week: 'قبل أسبوع', monthly: 'شهري' };
+  list.innerHTML = txs.map(t => {
+    const isIn = t.type === 'incoming';
+    const isDue = t.dueDate && new Date(t.dueDate) < new Date();
+    return `<div class="reminder-item">
+      <div class="reminder-icon ${isDue ? 'bg-red' : 'bg-orange'}">${isDue ? '🔴' : '⏰'}</div>
+      <div class="reminder-info">
+        <div class="reminder-name">${t.contactName}</div>
+        <div class="reminder-due" style="color:${isDue ? 'var(--red)' : 'var(--orange)'}">
+          ${isDue ? '⚠️ متأخر' : reminderLabels[t.reminder] || t.reminder}
+          ${t.dueDate ? ' · ' + formatDate(t.dueDate) : ''}
+        </div>
+      </div>
+      <div class="reminder-amount ${isIn ? 'green' : 'red'}">${t.amount} ${t.currency}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============ NOTIFICATIONS ============
+function generateNotifications() {
+  if (!DB.notifications.length) {
+    DB.notifications = [
+      { id: uid(), title: 'مرحباً بك!', body: 'شكراً لاستخدام تطبيق حسابي. ابدأ بإضافة جهاتك ومعاملاتك.', icon: '👋', time: Date.now(), read: false },
+      { id: uid(), title: 'تذكير السداد', body: 'لديك معاملات مستحقة السداد قريباً، تحقق من التذكيرات.', icon: '⏰', time: Date.now() - 3600000, read: false },
+      { id: uid(), title: 'نسخ احتياطي', body: 'احرص على عمل نسخ احتياطي لبياناتك بانتظام.', icon: '☁️', time: Date.now() - 7200000, read: true },
+    ];
+    saveDB();
+  }
+  updateNotifBadge();
+}
+
+function renderNotifications() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (!DB.notifications.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-title">لا توجد إشعارات</div></div>`;
+    return;
+  }
+  list.innerHTML = DB.notifications.map(n => `
+    <div class="notif-item ${n.read ? '' : 'unread'}" onclick="readNotif('${n.id}')">
+      <div class="notif-icon" style="background:var(--bg3)">${n.icon}</div>
+      <div class="notif-text">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-body">${n.body}</div>
+        <div class="notif-time">${timeAgo(n.time)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function addNotif(title, body, icon = '📌') {
+  DB.notifications.unshift({ id: uid(), title, body, icon, time: Date.now(), read: false });
+  updateNotifBadge();
+  saveDB();
+}
+
+function readNotif(id) {
+  const n = DB.notifications.find(x => x.id === id);
+  if (n) n.read = true;
+  saveDB();
+  renderNotifications();
+  updateNotifBadge();
+}
+
+function markAllRead() {
+  DB.notifications.forEach(n => n.read = true);
+  saveDB();
+  renderNotifications();
+  updateNotifBadge();
+}
+
+function updateNotifBadge() {
+  const unread = DB.notifications.filter(n => !n.read).length;
+  const badge = document.getElementById('notifBadge');
+  if (badge) { badge.textContent = unread; badge.style.display = unread ? 'flex' : 'none'; }
+}
+
+// ============ SHARE ============
+function shareWhatsApp() {
+  window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+  closeModal('shareModal');
+}
+function shareSMS() {
+  window.location.href = `sms:?body=${encodeURIComponent(shareText)}`;
+  closeModal('shareModal');
+}
+function shareEmail() {
+  window.location.href = `mailto:?subject=تقرير حسابي&body=${encodeURIComponent(shareText)}`;
+  closeModal('shareModal');
+}
+function copyToClipboard() {
+  navigator.clipboard.writeText(shareText).then(() => showToast('تم النسخ 📋', 'success'));
+  closeModal('shareModal');
+}
+function shareNative() {
+  if (navigator.share) {
+    navigator.share({ title: 'حسابي', text: shareText }).catch(() => {});
+  } else {
+    copyToClipboard();
+  }
+  closeModal('shareModal');
+}
+function downloadPDF() {
+  window.print();
+  closeModal('shareModal');
+}
+
+function exportReport() {
+  let forMe = 0, onMe = 0;
+  DB.transactions.forEach(t => {
+    if (t.status !== 'settled') {
+      if (t.type === 'incoming') forMe += parseFloat(t.amount)||0;
+      else onMe += parseFloat(t.amount)||0;
+    }
+  });
+  const cur = DB.settings.currency;
+  shareText = `📊 تقرير حسابي\n${'═'.repeat(25)}\n\n💚 إجمالي لي: ${forMe.toFixed(2)} ${cur}\n❤️ إجمالي علي: ${onMe.toFixed(2)} ${cur}\n📈 الصافي: ${(forMe-onMe).toFixed(2)} ${cur}\n\n👥 جهات الاتصال: ${DB.contacts.length}\n📋 المعاملات: ${DB.transactions.length}\n\nالتاريخ: ${new Date().toLocaleDateString('ar-SA')}\n\nتطبيق حسابي 💰`;
+  openModal('shareModal');
+}
+
+function shareReport() { exportReport(); }
+
+// ============ SETTINGS ============
+function editProfile() {
+  if (DB.user) {
+    document.getElementById('editName').value = DB.user.name || '';
+    document.getElementById('editPhone').value = DB.user.phone || '';
+    document.getElementById('editEmail').value = DB.user.email || '';
+    document.getElementById('editBusiness').value = DB.user.business || '';
+  }
+  openModal('profileModal');
+}
+
+function saveProfile() {
+  const name = document.getElementById('editName').value.trim();
+  const phone = document.getElementById('editPhone').value.trim();
+  const email = document.getElementById('editEmail').value.trim();
+  const business = document.getElementById('editBusiness').value.trim();
+  if (!name) { showToast('يرجى إدخال الاسم', 'error'); return; }
+  DB.user = { ...DB.user, name, phone, email, business };
+  localStorage.setItem('hesabi_user_' + phone, JSON.stringify(DB.user));
+  saveDB();
+  updateHeaderUser();
+  closeModal('profileModal');
+  showToast('تم تحديث البيانات ✅', 'success');
+}
+
+function changePwd() { showToast('سيتم إرسال رمز تغيير كلمة المرور', 'success'); }
+function toggleSetting(key) {
+  DB.settings[key] = !DB.settings[key];
+  saveDB();
+  const toggle = document.getElementById(key + 'Toggle');
+  if (toggle) toggle.classList.toggle('on', DB.settings[key]);
+}
+function changeCurrency() {
+  const curs = ['ر.س','$','€','£','د.إ','د.ك'];
+  const idx = curs.indexOf(DB.settings.currency);
+  DB.settings.currency = curs[(idx+1) % curs.length];
+  const labels = { 'ر.س':'ريال سعودي (ر.س)', '$':'دولار أمريكي ($)', '€':'يورو (€)', '£':'جنيه إسترليني (£)', 'د.إ':'درهم إماراتي (د.إ)', 'د.ك':'دينار كويتي (د.ك)' };
+  setText('defaultCurrencyLabel', labels[DB.settings.currency] || DB.settings.currency);
+  saveDB();
+  showToast(`العملة: ${DB.settings.currency}`, 'success');
+}
+function backupData() {
+  const data = JSON.stringify(DB);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `hesabi_backup_${Date.now()}.json`; a.click();
+  showToast('تم تصدير النسخة الاحتياطية ✅', 'success');
+}
+function restoreData() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        DB = data; saveDB(); renderAll();
+        showToast('تم استعادة البيانات ✅', 'success');
+      } catch { showToast('ملف غير صالح', 'error'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+function exportAll() { backupData(); }
+function showAbout() { showToast('حسابي v1.0.0 - إدارة مالية ذكية 💰', 'success'); }
+function subscribePro() { showToast('سيتم تفعيل الاشتراك قريباً 👑', 'success'); }
+function subscribeBusiness() { showToast('سيتم تفعيل الاشتراك قريباً 💎', 'success'); }
+
+// ============ DARK MODE (REAL FIX) ============
+function toggleDarkMode() {
+  DB.settings.dark = !DB.settings.dark;
+  applyDarkMode();
+  saveDB();
+}
+
+function applyDarkMode() {
+  const isDark = DB.settings.dark !== false;
+  document.body.classList.toggle('light-mode', !isDark);
+  const toggle = document.getElementById('darkToggle');
+  const sub = document.getElementById('darkModeSub');
+  if (toggle) toggle.classList.toggle('on', isDark);
+  if (sub) sub.textContent = isDark ? 'مفعّل' : 'موقف';
+}
+
+// ============ TERMINOLOGY ============
+const DEFAULT_TERMS = {
+  incoming: 'لي', incomingSub: 'مستحق لي',
+  outgoing: 'علي', outgoingSub: 'مستحق علي',
+  client: 'عميل', supplier: 'مورد', agent: 'مندوب',
+  creditor: 'دائن', debtor: 'مدين', partner: 'شريك',
+  statement: 'كشف الحسابات', appName: 'حسابي'
+};
+
+function getTerms() {
+  return Object.assign({}, DEFAULT_TERMS, DB.terminology || {});
+}
+
+function getTerm(key) {
+  return (DB.terminology && DB.terminology[key]) || DEFAULT_TERMS[key] || key;
+}
+
+function applyTerminology() {
+  const T = getTerms();
+  // Home labels
+  const lFor = document.getElementById('labelForMe');
+  const lOn = document.getElementById('labelOnMe');
+  if (lFor) lFor.textContent = T.incoming + ' (مستحق)';
+  if (lOn) lOn.textContent = T.outgoing + ' (مديونية)';
+  // Transaction type select
+  const txType = document.getElementById('txType');
+  if (txType) {
+    txType.options[0].text = `📥 ${T.incoming} (مستحق عليهم)`;
+    txType.options[1].text = `📤 ${T.outgoing} (مديونية)`;
+  }
+  // Update quick actions
+  renderQuickActions();
+  // Update type names in contact type select
+  updateContactTypeOptions();
+}
+
+function updateContactTypeOptions() {
+  const T = getTerms();
+  const mapping = { 'عميل': T.client, 'مورد': T.supplier, 'مندوب': T.agent, 'دائن': T.creditor, 'مدين': T.debtor, 'شريك': T.partner };
+  ['cType'].forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    Array.from(sel.options).forEach(opt => {
+      const mapped = mapping[opt.value];
+      if (mapped && mapped !== opt.value) {
+        const emoji = opt.text.match(/^([\p{Emoji}]+)/u)?.[0] || '';
+        opt.text = `${emoji} ${mapped}`;
+      }
+    });
+  });
+}
+
+function initTerminologyPage() {
+  const T = getTerms();
+  document.getElementById('termIncoming').value = T.incoming;
+  document.getElementById('termIncomingSub').value = T.incomingSub;
+  document.getElementById('termOutgoing').value = T.outgoing;
+  document.getElementById('termOutgoingSub').value = T.outgoingSub;
+  document.getElementById('termClient').value = T.client;
+  document.getElementById('termSupplier').value = T.supplier;
+  document.getElementById('termAgent').value = T.agent;
+  document.getElementById('termCreditor').value = T.creditor;
+  document.getElementById('termDebtor').value = T.debtor;
+  document.getElementById('termPartner').value = T.partner;
+  document.getElementById('termStatement').value = T.statement;
+  document.getElementById('termAppName').value = T.appName;
+}
+
+function setTerm(type, main, sub) {
+  if (type === 'incoming') {
+    document.getElementById('termIncoming').value = main;
+    document.getElementById('termIncomingSub').value = sub;
+  } else {
+    document.getElementById('termOutgoing').value = main;
+    document.getElementById('termOutgoingSub').value = sub;
+  }
+}
+
+function saveTerminology() {
+  DB.terminology = {
+    incoming: document.getElementById('termIncoming').value.trim() || DEFAULT_TERMS.incoming,
+    incomingSub: document.getElementById('termIncomingSub').value.trim() || DEFAULT_TERMS.incomingSub,
+    outgoing: document.getElementById('termOutgoing').value.trim() || DEFAULT_TERMS.outgoing,
+    outgoingSub: document.getElementById('termOutgoingSub').value.trim() || DEFAULT_TERMS.outgoingSub,
+    client: document.getElementById('termClient').value.trim() || DEFAULT_TERMS.client,
+    supplier: document.getElementById('termSupplier').value.trim() || DEFAULT_TERMS.supplier,
+    agent: document.getElementById('termAgent').value.trim() || DEFAULT_TERMS.agent,
+    creditor: document.getElementById('termCreditor').value.trim() || DEFAULT_TERMS.creditor,
+    debtor: document.getElementById('termDebtor').value.trim() || DEFAULT_TERMS.debtor,
+    partner: document.getElementById('termPartner').value.trim() || DEFAULT_TERMS.partner,
+    statement: document.getElementById('termStatement').value.trim() || DEFAULT_TERMS.statement,
+    appName: document.getElementById('termAppName').value.trim() || DEFAULT_TERMS.appName,
+  };
+  saveDB();
+  applyTerminology();
+  const lbl = document.getElementById('terminologySubLabel');
+  if (lbl) lbl.textContent = `${DB.terminology.incoming} / ${DB.terminology.outgoing} / ${DB.terminology.debtor} / ${DB.terminology.creditor}`;
+  showToast('تم حفظ المسميات ✅', 'success');
+}
+
+function resetTerminology() {
+  DB.terminology = { ...DEFAULT_TERMS };
+  saveDB();
+  initTerminologyPage();
+  applyTerminology();
+  showToast('تم إعادة التعيين ↺', 'success');
+}
+
+// ============ DASHBOARD SETTINGS ============
+const ALL_WIDGETS = [
+  { id: 'balance',      label: 'بطاقة الرصيد',        icon: '💰', def: true },
+  { id: 'quickactions', label: 'الأزرار السريعة',      icon: '⚡', def: true },
+  { id: 'stats',        label: 'بطاقات الإحصائيات',   icon: '📊', def: true },
+  { id: 'recent',       label: 'آخر المعاملات',        icon: '📋', def: true },
+];
+
+const ALL_QUICK_ACTIONS = [
+  { id: 'qa-incoming',  label: 'إضافة لي',    icon: '📥', action: "openAddModal('incoming')", def: true },
+  { id: 'qa-outgoing',  label: 'إضافة علي',   icon: '📤', action: "openAddModal('outgoing')", def: true },
+  { id: 'qa-contact',   label: 'جهة جديدة',   icon: '👤', action: "showPage('contacts');showAddContact()", def: true },
+  { id: 'qa-reports',   label: 'التقارير',    icon: '📊', action: "showPage('reports')", def: true },
+  { id: 'qa-map',       label: 'الخريطة',     icon: '🗺️', action: "showPage('map')", def: false },
+  { id: 'qa-statements',label: 'الكشوف',      icon: '📑', action: "showPage('statements')", def: false },
+  { id: 'qa-reminders', label: 'التذكيرات',   icon: '⏰', action: "showPage('reminders')", def: false },
+  { id: 'qa-search',    label: 'بحث',         icon: '🔍', action: "openSearch()", def: false },
+];
+
+function getDashSettings() {
+  if (!DB.dashSettings) DB.dashSettings = {
+    widgets: ALL_WIDGETS.reduce((o,w) => { o[w.id]=w.def; return o; }, {}),
+    quickActions: ALL_QUICK_ACTIONS.reduce((o,q) => { o[q.id]=q.def; return o; }, {})
+  };
+  return DB.dashSettings;
+}
+
+function initDashboardSettings() {
+  const ds = getDashSettings();
+  // Widgets
+  const wList = document.getElementById('dashWidgetsList');
+  if (wList) {
+    wList.innerHTML = ALL_WIDGETS.map(w => `
+      <div class="dash-widget-row">
+        <div class="dw-left"><div class="dw-icon">${w.icon}</div><div><div class="dw-label">${w.label}</div></div></div>
+        <div class="toggle ${ds.widgets[w.id]!==false?'on':''}" id="dw-${w.id}" onclick="toggleDashWidget('${w.id}')"></div>
+      </div>`).join('');
+  }
+  // Quick actions
+  const qList = document.getElementById('dashQuickList');
+  if (qList) {
+    qList.innerHTML = ALL_QUICK_ACTIONS.map(q => `
+      <div class="dash-widget-row">
+        <div class="dw-left"><div class="dw-icon">${q.icon}</div><div><div class="dw-label">${q.label}</div></div></div>
+        <div class="toggle ${ds.quickActions[q.id]!==false?'on':''}" id="dq-${q.id}" onclick="toggleDashQuick('${q.id}')"></div>
+      </div>`).join('');
+  }
+}
+
+function toggleDashWidget(id) {
+  const ds = getDashSettings();
+  ds.widgets[id] = !ds.widgets[id];
+  const el = document.getElementById('dw-' + id);
+  if (el) el.classList.toggle('on', ds.widgets[id]);
+}
+
+function toggleDashQuick(id) {
+  const ds = getDashSettings();
+  const enabled = Object.values(ds.quickActions).filter(Boolean).length;
+  if (ds.quickActions[id] && enabled <= 1) { showToast('يجب إبقاء زر واحد على الأقل', 'error'); return; }
+  if (!ds.quickActions[id] && enabled >= 4) { showToast('الحد الأقصى 4 أزرار', 'error'); return; }
+  ds.quickActions[id] = !ds.quickActions[id];
+  const el = document.getElementById('dq-' + id);
+  if (el) el.classList.toggle('on', ds.quickActions[id]);
+}
+
+function saveDashboardSettings() {
+  saveDB();
+  applyDashboardSettings();
+  showToast('تم حفظ إعدادات الواجهة ✅', 'success');
+}
+
+function applyDashboardSettings() {
+  const ds = getDashSettings();
+  ALL_WIDGETS.forEach(w => {
+    const el = document.getElementById('widget-' + w.id);
+    if (el) el.style.display = ds.widgets[w.id] !== false ? '' : 'none';
+  });
+  renderQuickActions();
+}
+
+function renderQuickActions() {
+  const ds = getDashSettings();
+  const T = getTerms();
+  const bar = document.getElementById('widget-quickactions');
+  if (!bar) return;
+  const active = ALL_QUICK_ACTIONS.filter(q => ds.quickActions[q.id] !== false);
+  // Apply terminology to labels
+  const labelMap = { 'qa-incoming': T.incoming, 'qa-outgoing': T.outgoing };
+  bar.innerHTML = active.map(q => `
+    <div class="qa-btn" onclick="${q.action}">
+      <div class="q-icon">${q.icon}</div>
+      <div class="q-label">${labelMap[q.id] || q.label}</div>
+    </div>`).join('');
+}
+
+// ============ MAP PICKER FIX ============
+// Override openMapPicker to fix modal display and touch events
+function openMapPicker() {
+  const overlay = document.getElementById('mapPickerModal');
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'stretch';
+  requestAnimationFrame(() => {
+    overlay.classList.add('open');
+    setTimeout(() => initPickerMapFixed(), 300);
+  });
+}
+
+function initPickerMapFixed() {
+  const container = document.getElementById('mapPickerDiv');
+  if (!container) return;
+  if (pickerMap) { try { pickerMap.remove(); } catch(e){} pickerMap = null; }
+
+  const savedLat = parseFloat(document.getElementById('cLat').value);
+  const savedLng = parseFloat(document.getElementById('cLng').value);
+  const center = (savedLat && savedLng) ? [savedLat, savedLng] : DEFAULT_CENTER;
+
+  pickerMap = L.map('mapPickerDiv', {
+    zoomControl: true,
+    attributionControl: false,
+    tap: false  // Fix iOS tap issues
+  });
+  L.tileLayer(TILE_URL, { maxZoom: 19 }).addTo(pickerMap);
+  pickerMap.setView(center, savedLat ? 15 : DEFAULT_ZOOM);
+
+  // Force size recalculation
+  setTimeout(() => pickerMap.invalidateSize(), 100);
+
+  pickerMap.on('move', updatePickerInfo);
+  pickerMap.on('moveend', reverseGeocode);
+  updatePickerInfo();
+}
+
+// Also fix closeModal to handle map picker properly
+const _origCloseModal = window.closeModal;
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('open');
+  if (id === 'mapPickerModal') {
+    el.style.display = '';
+    if (pickerMap) { try { pickerMap.remove(); } catch(e){} pickerMap = null; }
+  }
+  if (id === 'contactMapModal' && contactMapInst) {
+    try { contactMapInst.remove(); } catch(e){}
+    contactMapInst = null;
+  }
+}
+
+// ============ STATEMENTS ============
+let stTab = 'total';
+let stData = [];
+
+function populateStContactDropdown() {
+  refreshDropdownItems();
+}
+
+function switchStTab(tab) {
+  stTab = tab;
+  ['total','analytic','person'].forEach(t => {
+    const el = document.getElementById('stTab' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (el) el.classList.toggle('active', t === tab);
+  });
+  if (stData.length) renderStatementOutput();
+}
+
+function resetStFilters() {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).toISOString().split('T')[0];
+  document.getElementById('stFromDate').value = firstDay;
+  document.getElementById('stToDate').value = lastDay;
+  document.getElementById('stContact').value = '';
+  document.getElementById('stContactType').value = '';
+  document.getElementById('stTxType').value = '';
+  document.getElementById('stStatus').value = '';
+  document.getElementById('statementOutput').innerHTML = '';
+  document.getElementById('stExportBtns').style.display = 'none';
+}
+
+function generateStatement() {
+  const from = document.getElementById('stFromDate').value;
+  const to = document.getElementById('stToDate').value;
+  const contactId = document.getElementById('stContact').value;
+  const contactType = document.getElementById('stContactType').value;
+  const txType = document.getElementById('stTxType').value;
+  const status = document.getElementById('stStatus').value;
+
+  stData = DB.transactions.filter(t => {
+    let ok = true;
+    if (from && t.date < from) ok = false;
+    if (to && t.date > to) ok = false;
+    if (contactId && t.contactId !== contactId) ok = false;
+    if (contactType) {
+      const c = DB.contacts.find(x => x.id === t.contactId);
+      if (!c || c.type !== contactType) ok = false;
+    }
+    if (txType && t.type !== txType) ok = false;
+    if (status && t.status !== status) ok = false;
+    return ok;
+  });
+
+  if (!stData.length) {
+    document.getElementById('statementOutput').innerHTML = `<div class="empty-state"><div class="empty-icon">📑</div><div class="empty-title">لا توجد بيانات</div><div class="empty-sub">عدّل معايير الفلترة وحاول مرة أخرى</div></div>`;
+    document.getElementById('stExportBtns').style.display = 'none';
+    return;
+  }
+
+  renderStatementOutput();
+  document.getElementById('stExportBtns').style.display = 'block';
+  showToast(`تم توليد الكشف - ${stData.length} معاملة`, 'success');
+}
+
+function renderStatementOutput() {
+  const out = document.getElementById('statementOutput');
+  if (!out) return;
+
+  const cur = DB.settings.currency;
+  let forMe = 0, onMe = 0, settled = 0;
+  stData.forEach(t => {
+    if (t.status === 'settled') settled += parseFloat(t.amount)||0;
+    else if (t.type === 'incoming') forMe += parseFloat(t.amount)||0;
+    else onMe += parseFloat(t.amount)||0;
+  });
+  const net = forMe - onMe;
+
+  const summaryHTML = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">
+      <div class="report-card bg-green" style="border-color:var(--green);border-radius:var(--r2);padding:14px;">
+        <div style="font-size:11px;color:var(--green);">إجمالي لي</div>
+        <div class="green" style="font-size:20px;font-weight:800;margin-top:4px;">${forMe.toFixed(2)}<span style="font-size:12px;"> ${cur}</span></div>
+      </div>
+      <div class="report-card bg-red" style="border-color:var(--red);border-radius:var(--r2);padding:14px;">
+        <div style="font-size:11px;color:var(--red);">إجمالي علي</div>
+        <div class="red" style="font-size:20px;font-weight:800;margin-top:4px;">${onMe.toFixed(2)}<span style="font-size:12px;"> ${cur}</span></div>
+      </div>
+      <div class="report-card bg-gold" style="border-color:var(--gold);border-radius:var(--r2);padding:14px;">
+        <div style="font-size:11px;color:var(--gold);">الصافي</div>
+        <div class="${net>=0?'green':'red'}" style="font-size:20px;font-weight:800;margin-top:4px;">${net>=0?'+':''}${net.toFixed(2)}<span style="font-size:12px;"> ${cur}</span></div>
+      </div>
+      <div class="report-card bg-blue" style="border-color:var(--blue);border-radius:var(--r2);padding:14px;">
+        <div style="font-size:11px;color:var(--blue);">المعاملات</div>
+        <div class="blue" style="font-size:20px;font-weight:800;margin-top:4px;">${stData.length}<span style="font-size:12px;"> معاملة</span></div>
+      </div>
+    </div>`;
+
+  if (stTab === 'total') {
+    out.innerHTML = summaryHTML + renderTotalStatement();
+  } else if (stTab === 'analytic') {
+    out.innerHTML = summaryHTML + renderAnalyticStatement();
+  } else {
+    out.innerHTML = summaryHTML + renderPersonStatement();
+  }
+}
+
+function renderTotalStatement() {
+  const cur = DB.settings.currency;
+  const rows = stData.map(t => {
+    const isIn = t.type === 'incoming';
+    const statusLabel = { pending:'معلقة', partial:'جزئية', settled:'مسوّاة' }[t.status]||'';
+    return `<tr>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;">${formatDate(t.date)}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;font-weight:600;">${t.contactName}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:12px;color:var(--text2);">${t.notes||'-'}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;color:var(--green);font-weight:700;text-align:left;">${isIn?t.amount+' '+t.currency:'-'}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;color:var(--red);font-weight:700;text-align:left;">${!isIn?t.amount+' '+t.currency:'-'}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:11px;"><span style="padding:3px 8px;border-radius:6px;background:${t.status==='settled'?'var(--green2)':t.status==='partial'?'var(--blue3)':'var(--orange2)'};color:${t.status==='settled'?'var(--green)':t.status==='partial'?'var(--blue)':'var(--orange)'};">${statusLabel}</span></td>
+    </tr>`;
+  }).join('');
+
+  return `<div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;">
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border2);font-size:14px;font-weight:700;">📋 الكشف الإجمالي (${stData.length} معاملة)</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;min-width:500px;">
+        <thead>
+          <tr style="background:var(--bg3);">
+            <th style="padding:10px 12px;font-size:12px;color:var(--text2);font-weight:600;text-align:right;">التاريخ</th>
+            <th style="padding:10px 12px;font-size:12px;color:var(--text2);font-weight:600;text-align:right;">الجهة</th>
+            <th style="padding:10px 12px;font-size:12px;color:var(--text2);font-weight:600;text-align:right;">البيان</th>
+            <th style="padding:10px 12px;font-size:12px;color:var(--green);font-weight:600;text-align:left;">لي 📥</th>
+            <th style="padding:10px 12px;font-size:12px;color:var(--red);font-weight:600;text-align:left;">علي 📤</th>
+            <th style="padding:10px 12px;font-size:12px;color:var(--text2);font-weight:600;">الحالة</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderAnalyticStatement() {
+  const cur = DB.settings.currency;
+  // Group by month
+  const byMonth = {};
+  stData.forEach(t => {
+    const key = t.date ? t.date.substr(0,7) : 'غير محدد';
+    if (!byMonth[key]) byMonth[key] = { forMe:0, onMe:0, count:0, txs:[] };
+    if (t.type==='incoming') byMonth[key].forMe += parseFloat(t.amount)||0;
+    else byMonth[key].onMe += parseFloat(t.amount)||0;
+    byMonth[key].count++;
+    byMonth[key].txs.push(t);
+  });
+
+  // Group by type
+  const byType = {};
+  stData.forEach(t => {
+    const c = DB.contacts.find(x=>x.id===t.contactId);
+    const type = c?.type || 'أخرى';
+    if (!byType[type]) byType[type] = { forMe:0, onMe:0, count:0 };
+    if (t.type==='incoming') byType[type].forMe += parseFloat(t.amount)||0;
+    else byType[type].onMe += parseFloat(t.amount)||0;
+    byType[type].count++;
+  });
+
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const monthLabel = k => { const [y,m]=k.split('-'); return (months[parseInt(m)-1]||m)+' '+y; };
+
+  const monthRows = Object.entries(byMonth).sort().map(([k,v]) => {
+    const net = v.forMe - v.onMe;
+    return `<tr>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;font-weight:600;">${monthLabel(k)}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;text-align:center;">${v.count}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;color:var(--green);font-weight:700;text-align:left;">${v.forMe.toFixed(2)} ${cur}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;color:var(--red);font-weight:700;text-align:left;">${v.onMe.toFixed(2)} ${cur}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;font-weight:800;" class="${net>=0?'green':'red'}">${net>=0?'+':''}${net.toFixed(2)} ${cur}</td>
+    </tr>`;
+  }).join('');
+
+  const typeColors2 = { 'عميل':'var(--blue)','مورد':'var(--orange)','مندوب':'var(--purple)','دائن':'var(--red)','مدين':'var(--green)','شريك':'var(--gold)','أخرى':'var(--text2)' };
+  const typeRows = Object.entries(byType).map(([type,v]) => {
+    const net = v.forMe - v.onMe;
+    const color = typeColors2[type]||'var(--text2)';
+    return `<tr>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;font-weight:600;color:${color};">${type}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;text-align:center;">${v.count}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;color:var(--green);font-weight:700;text-align:left;">${v.forMe.toFixed(2)} ${cur}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;color:var(--red);font-weight:700;text-align:left;">${v.onMe.toFixed(2)} ${cur}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid var(--border2);font-size:13px;font-weight:800;" class="${net>=0?'green':'red'}">${net>=0?'+':''}${net.toFixed(2)} ${cur}</td>
+    </tr>`;
+  }).join('');
+
+  const tableHead = `<thead><tr style="background:var(--bg3);">
+    <th style="padding:10px 12px;font-size:12px;color:var(--text2);font-weight:600;text-align:right;">الفترة</th>
+    <th style="padding:10px 12px;font-size:12px;color:var(--text2);font-weight:600;">العدد</th>
+    <th style="padding:10px 12px;font-size:12px;color:var(--green);font-weight:600;text-align:left;">لي</th>
+    <th style="padding:10px 12px;font-size:12px;color:var(--red);font-weight:600;text-align:left;">علي</th>
+    <th style="padding:10px 12px;font-size:12px;color:var(--gold);font-weight:600;text-align:right;">الصافي</th>
+  </tr></thead>`;
+
+  return `
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-bottom:14px;">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border2);font-size:14px;font-weight:700;">📅 التحليل الشهري</div>
+      <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">${tableHead}<tbody>${monthRows}</tbody></table></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border2);font-size:14px;font-weight:700;">🏷️ التحليل حسب نوع الجهة</div>
+      <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:var(--bg3);">
+          <th style="padding:10px 12px;font-size:12px;color:var(--text2);font-weight:600;text-align:right;">نوع الجهة</th>
+          <th style="padding:10px 12px;font-size:12px;color:var(--text2);font-weight:600;">العدد</th>
+          <th style="padding:10px 12px;font-size:12px;color:var(--green);font-weight:600;text-align:left;">لي</th>
+          <th style="padding:10px 12px;font-size:12px;color:var(--red);font-weight:600;text-align:left;">علي</th>
+          <th style="padding:10px 12px;font-size:12px;color:var(--gold);font-weight:600;">الصافي</th>
+        </tr></thead>
+        <tbody>${typeRows}</tbody>
+      </table></div>
+    </div>`;
+}
+
+function renderPersonStatement() {
+  const cur = DB.settings.currency;
+  const byPerson = {};
+  stData.forEach(t => {
+    const k = t.contactId;
+    if (!byPerson[k]) byPerson[k] = { name: t.contactName, forMe:0, onMe:0, txs:[], type:'' };
+    const c = DB.contacts.find(x=>x.id===k);
+    byPerson[k].type = c?.type||'';
+    if (t.type==='incoming') byPerson[k].forMe += parseFloat(t.amount)||0;
+    else byPerson[k].onMe += parseFloat(t.amount)||0;
+    byPerson[k].txs.push(t);
+  });
+
+  return Object.entries(byPerson).map(([cid, v]) => {
+    const net = v.forMe - v.onMe;
+    const tc = typeColors[v.type]||typeColors['أخرى'];
+    const txRows = v.txs.map(t => {
+      const isIn = t.type==='incoming';
+      return `<tr>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border2);font-size:12px;color:var(--text2);">${formatDate(t.date)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border2);font-size:12px;">${t.notes||'-'}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border2);font-size:13px;color:var(--green);font-weight:700;text-align:left;">${isIn?t.amount+' '+t.currency:'-'}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border2);font-size:13px;color:var(--red);font-weight:700;text-align:left;">${!isIn?t.amount+' '+t.currency:'-'}</td>
+      </tr>`;
+    }).join('');
+    return `<div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-bottom:12px;">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;" class="${tc.bg}">${tc.emoji}</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;">${v.name}</div>
+            <div style="font-size:12px;color:var(--${tc.color})">${v.type}</div>
+          </div>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-size:16px;font-weight:800;" class="${net>=0?'green':'red'}">${net>=0?'+':''}${net.toFixed(2)} ${cur}</div>
+          <div style="font-size:11px;color:var(--text3);">${v.txs.length} معاملة</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:var(--bg3);">
+          <th style="padding:8px 12px;font-size:11px;color:var(--text2);font-weight:600;text-align:right;">التاريخ</th>
+          <th style="padding:8px 12px;font-size:11px;color:var(--text2);font-weight:600;text-align:right;">البيان</th>
+          <th style="padding:8px 12px;font-size:11px;color:var(--green);font-weight:600;text-align:left;">لي</th>
+          <th style="padding:8px 12px;font-size:11px;color:var(--red);font-weight:600;text-align:left;">علي</th>
+        </tr></thead>
+        <tbody>${txRows}</tbody>
+      </table></div>
+      <div style="padding:10px 16px;background:var(--bg3);display:flex;justify-content:space-between;font-size:13px;">
+        <span>إجمالي لي: <strong class="green">${v.forMe.toFixed(2)} ${cur}</strong></span>
+        <span>إجمالي علي: <strong class="red">${v.onMe.toFixed(2)} ${cur}</strong></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function exportStatementPDF() {
+  const from = document.getElementById('stFromDate').value;
+  const to = document.getElementById('stToDate').value;
+  const cur = DB.settings.currency;
+  const branding = DB.branding || {};
+  const logoHtml = branding.logoData ? `<img src="${branding.logoData}" style="height:60px;object-fit:contain;">` : `<div style="font-size:32px;">💰</div>`;
+  const primaryColor = branding.primaryColor || '#f6c90e';
+
+  let forMe=0, onMe=0;
+  stData.forEach(t => {
+    if (t.type==='incoming') forMe += parseFloat(t.amount)||0;
+    else onMe += parseFloat(t.amount)||0;
+  });
+
+  const rows = stData.map(t => {
+    const isIn = t.type==='incoming';
+    const statusLabel = { pending:'معلقة', partial:'جزئية', settled:'مسوّاة' }[t.status]||'';
+    return `<tr>
+      <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:12px;">${formatDate(t.date)}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:12px;font-weight:600;">${t.contactName}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${t.notes||'-'}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:12px;color:green;font-weight:700;">${isIn?t.amount+' '+t.currency:''}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:12px;color:red;font-weight:700;">${!isIn?t.amount+' '+t.currency:''}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:11px;">${statusLabel}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html lang="ar" dir="rtl">
+  <head><meta charset="UTF-8"><title>كشف الحساب</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Cairo',Arial,sans-serif;direction:rtl;text-align:right;background:#fff;color:#1a1a2e;padding:30px;}
+    .header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid ${primaryColor};padding-bottom:20px;margin-bottom:20px;}
+    .brand{display:flex;align-items:center;gap:16px;}
+    .brand-info h1{font-size:22px;font-weight:900;color:#1a1a2e;}
+    .brand-info p{font-size:12px;color:#666;margin-top:4px;}
+    .report-info{text-align:left;}
+    .report-info .title{font-size:18px;font-weight:700;color:${primaryColor};}
+    .report-info .date{font-size:12px;color:#666;margin-top:4px;}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+    .sum-card{border:1px solid #eee;border-radius:10px;padding:14px;text-align:center;}
+    .sum-card .lbl{font-size:11px;color:#666;margin-bottom:6px;}
+    .sum-card .val{font-size:18px;font-weight:800;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:${primaryColor};color:#000;padding:10px 12px;font-size:12px;font-weight:700;text-align:right;}
+    tr:nth-child(even){background:#f9f9f9;}
+    .footer{margin-top:24px;text-align:center;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:16px;}
+    @media print{body{padding:15px;}}
+  </style></head>
+  <body>
+  <div class="header">
+    <div class="brand">${logoHtml}<div class="brand-info"><h1>${branding.name||'حسابي'}</h1><p>${branding.address||''}</p><p>${branding.phone||''}</p></div></div>
+    <div class="report-info"><div class="title">كشف الحسابات ${stTab==='total'?'الإجمالي':stTab==='analytic'?'التحليلي':'بالشخص'}</div><div class="date">من: ${from||'البداية'} إلى: ${to||'الآن'}</div><div class="date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div></div>
+  </div>
+  <div class="summary">
+    <div class="sum-card"><div class="lbl">إجمالي لي</div><div class="val" style="color:green;">${forMe.toFixed(2)} ${cur}</div></div>
+    <div class="sum-card"><div class="lbl">إجمالي علي</div><div class="val" style="color:red;">${onMe.toFixed(2)} ${cur}</div></div>
+    <div class="sum-card"><div class="lbl">الصافي</div><div class="val" style="color:${forMe-onMe>=0?'green':'red'}">${(forMe-onMe>=0?'+':'')+(forMe-onMe).toFixed(2)} ${cur}</div></div>
+    <div class="sum-card"><div class="lbl">عدد المعاملات</div><div class="val">${stData.length}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>التاريخ</th><th>الجهة</th><th>البيان</th><th style="color:darkgreen;">لي</th><th style="color:darkred;">علي</th><th>الحالة</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="footer">تم إنشاء هذا الكشف بواسطة تطبيق حسابي – ${new Date().toLocaleDateString('ar-SA')}</div>
+  <script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script>
+  </body></html>`;
+
+  const win = window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+}
+
+function exportStatementExcel() {
+  const cur = DB.settings.currency;
+  const branding = DB.branding || {};
+  // Build CSV with BOM for Arabic
+  let csv = '\uFEFF';
+  csv += `كشف الحسابات - ${branding.name||'حسابي'}\n`;
+  csv += `من: ${document.getElementById('stFromDate').value||'البداية'} إلى: ${document.getElementById('stToDate').value||'الآن'}\n\n`;
+  csv += `التاريخ,الجهة,نوع الجهة,البيان,النوع,المبلغ,العملة,الحالة,تاريخ الاستحقاق\n`;
+  stData.forEach(t => {
+    const c = DB.contacts.find(x=>x.id===t.contactId);
+    const type = t.type==='incoming'?'لي':'علي';
+    const status = { pending:'معلقة', partial:'جزئية', settled:'مسوّاة' }[t.status]||'';
+    csv += `"${t.date}","${t.contactName}","${c?.type||''}","${t.notes||''}","${type}","${t.amount}","${t.currency}","${status}","${t.dueDate||''}"\n`;
+  });
+
+  let forMe=0, onMe=0;
+  stData.forEach(t => { if(t.type==='incoming') forMe+=parseFloat(t.amount)||0; else onMe+=parseFloat(t.amount)||0; });
+  csv += `\nالإجمالي\n`;
+  csv += `"","","","","لي","${forMe.toFixed(2)}","${cur}"\n`;
+  csv += `"","","","","علي","${onMe.toFixed(2)}","${cur}"\n`;
+  csv += `"","","","","الصافي","${(forMe-onMe).toFixed(2)}","${cur}"\n`;
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `كشف_حسابات_${Date.now()}.csv`;
+  a.click();
+  showToast('تم تصدير ملف Excel ✅', 'success');
+}
+
+function shareStatement() {
+  let forMe=0, onMe=0;
+  stData.forEach(t => { if(t.type==='incoming') forMe+=parseFloat(t.amount)||0; else onMe+=parseFloat(t.amount)||0; });
+  const cur = DB.settings.currency;
+  const branding = DB.branding||{};
+  shareText = `📑 كشف الحسابات\n${branding.name?'المنشأة: '+branding.name+'\n':''}\n━━━━━━━━━━━━━━━\n`;
+  shareText += `✅ إجمالي لي: ${forMe.toFixed(2)} ${cur}\n`;
+  shareText += `❌ إجمالي علي: ${onMe.toFixed(2)} ${cur}\n`;
+  shareText += `📊 الصافي: ${(forMe-onMe>=0?'+':'')+(forMe-onMe).toFixed(2)} ${cur}\n`;
+  shareText += `📋 عدد المعاملات: ${stData.length}\n━━━━━━━━━━━━━━━\n\nتطبيق حسابي 💰`;
+  openModal('shareModal');
+}
+
+// ============ BRANDING ============
+const colorThemes = [
+  { name:'الذهبي', primary:'#f6c90e', bg:'#0a0f1e', card:'#111827' },
+  { name:'الأزرق', primary:'#3b82f6', bg:'#0f172a', card:'#1e293b' },
+  { name:'الأخضر', primary:'#10b981', bg:'#022c22', card:'#064e3b' },
+  { name:'الأحمر', primary:'#ef4444', bg:'#1a0a0a', card:'#2d1515' },
+  { name:'البنفسجي', primary:'#8b5cf6', bg:'#120a1e', card:'#1e1035' },
+  { name:'الفيروزي', primary:'#06b6d4', bg:'#0a1628', card:'#0f2337' },
+  { name:'الوردي', primary:'#ec4899', bg:'#1a0a14', card:'#2d1525' },
+  { name:'البرتقالي', primary:'#f97316', bg:'#1a0e06', card:'#2d1a0a' },
+  { name:'الأبيض', primary:'#1e293b', bg:'#f8fafc', card:'#ffffff' },
+];
+
+function initBranding() {
+  const themes = document.getElementById('colorThemes');
+  if (!themes) return;
+  themes.innerHTML = colorThemes.map((t,i) => `
+    <div onclick="applyTheme(${i})" style="border:2px solid ${t.primary};border-radius:12px;padding:12px;cursor:pointer;background:${t.bg};transition:all 0.2s;text-align:center;">
+      <div style="width:32px;height:32px;background:${t.primary};border-radius:8px;margin:0 auto 8px;"></div>
+      <div style="font-size:12px;font-weight:600;color:${t.primary};">${t.name}</div>
+    </div>`).join('');
+
+  const branding = DB.branding||{};
+  if (branding.name) document.getElementById('brandName').value = branding.name;
+  if (branding.address) document.getElementById('brandAddress').value = branding.address;
+  if (branding.phone) document.getElementById('brandPhone').value = branding.phone;
+  if (branding.primaryColor) {
+    document.getElementById('primaryColor').value = branding.primaryColor;
+    document.getElementById('primaryColorHex').value = branding.primaryColor;
+  }
+  if (branding.logoData) {
+    const lp = document.getElementById('logoPreview');
+    lp.innerHTML = `<img src="${branding.logoData}" style="width:100%;height:100%;object-fit:contain;border-radius:20px;">`;
+  }
+  updateBrandingPreview();
+
+  // Color sync
+  document.getElementById('primaryColor').oninput = e => {
+    document.getElementById('primaryColorHex').value = e.target.value;
+    updateBrandingPreview();
+  };
+  document.getElementById('primaryColorHex').oninput = e => {
+    document.getElementById('primaryColor').value = e.target.value;
+    updateBrandingPreview();
+  };
+}
+
+function applyTheme(i) {
+  const t = colorThemes[i];
+  document.getElementById('primaryColor').value = t.primary;
+  document.getElementById('primaryColorHex').value = t.primary;
+  document.getElementById('bgColor').value = t.bg;
+  document.getElementById('bgColorHex').value = t.bg;
+  // Live preview CSS
+  document.documentElement.style.setProperty('--gold', t.primary);
+  document.documentElement.style.setProperty('--gold2', t.primary);
+  document.documentElement.style.setProperty('--bg', t.bg);
+  document.documentElement.style.setProperty('--card', t.card);
+  updateBrandingPreview();
+  showToast(`تم تطبيق ثيم ${t.name} 🎨`, 'success');
+}
+
+function updateBrandingPreview() {
+  const preview = document.getElementById('brandingPreview');
+  if (!preview) return;
+  const primary = document.getElementById('primaryColor')?.value || '#f6c90e';
+  const name = document.getElementById('brandName')?.value || 'اسم المنشأة';
+  const branding = DB.branding||{};
+  const logoHtml = branding.logoData ? `<img src="${branding.logoData}" style="width:48px;height:48px;object-fit:contain;border-radius:10px;">` : `<div style="width:48px;height:48px;background:${primary};border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;">💰</div>`;
+  preview.innerHTML = `
+    <div style="background:#fff;padding:16px;direction:rtl;font-family:'Cairo',sans-serif;">
+      <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid ${primary};padding-bottom:12px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">${logoHtml}<div><div style="font-size:16px;font-weight:900;color:#1a1a2e;">${name}</div><div style="font-size:11px;color:#666;">${document.getElementById('brandAddress')?.value||''}</div></div></div>
+        <div style="text-align:left;"><div style="font-size:14px;font-weight:700;color:${primary};">كشف الحسابات</div><div style="font-size:11px;color:#888;">${new Date().toLocaleDateString('ar-SA')}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+        <div style="border:1px solid #eee;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:#888;">لي</div><div style="font-size:16px;font-weight:800;color:green;">+1,500</div></div>
+        <div style="border:1px solid #eee;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:#888;">علي</div><div style="font-size:16px;font-weight:800;color:red;">-800</div></div>
+        <div style="border:1px solid #eee;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:#888;">الصافي</div><div style="font-size:16px;font-weight:800;color:${primary};">+700</div></div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead><tr style="background:${primary};"><th style="padding:6px 8px;text-align:right;color:#000;">التاريخ</th><th style="padding:6px 8px;text-align:right;color:#000;">الجهة</th><th style="padding:6px 8px;text-align:right;color:#000;">المبلغ</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:6px 8px;border-bottom:1px solid #eee;">1 يناير</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">أحمد محمد</td><td style="padding:6px 8px;border-bottom:1px solid #eee;color:green;">+500</td></tr>
+          <tr style="background:#fafafa"><td style="padding:6px 8px;border-bottom:1px solid #eee;">5 يناير</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">شركة النور</td><td style="padding:6px 8px;border-bottom:1px solid #eee;color:red;">-300</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;text-align:center;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px;">تطبيق حسابي – ${new Date().toLocaleDateString('ar-SA')}</div>
+    </div>`;
+}
+
+function uploadLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lp = document.getElementById('logoPreview');
+    lp.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:contain;border-radius:20px;">`;
+    if (!DB.branding) DB.branding = {};
+    DB.branding.logoData = e.target.result;
+    updateBrandingPreview();
+    showToast('تم رفع الشعار ✅', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveBranding() {
+  if (!DB.branding) DB.branding = {};
+  DB.branding.name = document.getElementById('brandName').value.trim();
+  DB.branding.address = document.getElementById('brandAddress').value.trim();
+  DB.branding.phone = document.getElementById('brandPhone').value.trim();
+  DB.branding.primaryColor = document.getElementById('primaryColor').value;
+  DB.branding.bgColor = document.getElementById('bgColor').value;
+  saveDB();
+  showToast('تم حفظ التخصيص ✅', 'success');
+}
+
+// ============ PHOTOS ============
+function previewPhotos(input) {
+  const preview = document.getElementById('photosPreview');
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.className = 'photo-thumb';
+      preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============ SEARCH ============
+function openSearch() { showPage('transactions'); document.getElementById('txSearch')?.focus(); }
+
+// ============ UTILS ============
+function renderAll() {
+  renderHome();
+  renderContacts();
+  renderTransactions();
+  renderReports();
+  renderReminders();
+  updateNotifBadge();
+  populateTxContactDropdown();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+function uid() { return Math.random().toString(36).substr(2, 9); }
+function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function formatDate(d) {
+  if (!d) return '';
+  try { return new Date(d).toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' }); }
+  catch { return d; }
+}
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'الآن';
+  if (diff < 3600000) return `منذ ${Math.floor(diff/60000)} دقيقة`;
+  if (diff < 86400000) return `منذ ${Math.floor(diff/3600000)} ساعة`;
+  return `منذ ${Math.floor(diff/86400000)} يوم`;
+}
+function var_(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+// Add demo data on first launch
+function addDemoData() {
+  if (DB.contacts.length) return;
+  DB.contacts = [
+    { id: uid(), name: 'أحمد محمد', phone: '0501234567', type: 'عميل', email: '', notes: '', createdAt: Date.now() },
+    { id: uid(), name: 'شركة النور', phone: '0557654321', type: 'مورد', email: 'alnoor@co.sa', notes: '', createdAt: Date.now() },
+    { id: uid(), name: 'سالم العتيبي', phone: '0533456789', type: 'مندوب', email: '', notes: '', createdAt: Date.now() },
+    { id: uid(), name: 'فهد السهلي', phone: '0512345670', type: 'مدين', email: '', notes: 'قرض شخصي', createdAt: Date.now() },
+  ];
+  const [c1,c2,c3,c4] = DB.contacts;
+  const today = new Date().toISOString().split('T')[0];
+  DB.transactions = [
+    { id: uid(), contactId: c1.id, contactName: c1.name, amount: 1500, currency: 'ر.س', type: 'incoming', date: today, dueDate: '', notes: 'بضاعة', status: 'pending', reminder: '3days', createdAt: Date.now() },
+    { id: uid(), contactId: c2.id, contactName: c2.name, amount: 3200, currency: 'ر.س', type: 'outgoing', date: today, dueDate: '', notes: 'فاتورة موردين', status: 'pending', reminder: 'none', createdAt: Date.now() },
+    { id: uid(), contactId: c3.id, contactName: c3.name, amount: 800, currency: 'ر.س', type: 'incoming', date: today, dueDate: '', notes: 'عمولة', status: 'settled', reminder: 'none', createdAt: Date.now() },
+    { id: uid(), contactId: c4.id, contactName: c4.name, amount: 2000, currency: 'ر.س', type: 'incoming', date: today, dueDate: '', notes: 'قرض شخصي', status: 'pending', reminder: 'monthly', createdAt: Date.now() },
+  ];
+  saveDB();
+}
+
+// Initialize with demo data
+setTimeout(() => {
+  if (DB.user) addDemoData();
+}, 2600);
+
+// ============ MAP ENGINE ============
+let pickerMap = null;
+let pickerMarker = null;
+let mainMap = null;
+let mainMarkers = [];
+let contactMapInst = null;
+let mapTypeFilter = 'all';
+let currentMapContactId = null;
+let thumbMaps = {};
+
+const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const TILE_ATTR = '© OpenStreetMap';
+const DEFAULT_CENTER = [24.7136, 46.6753]; // Riyadh
+const DEFAULT_ZOOM = 12;
+
+const pinColors = {
+  'عميل':'#63b3ed','مورد':'#f6ad55','مندوب':'#b794f4',
+  'دائن':'#fc8181','مدين':'#48bb78','شريك':'#f6c90e','أخرى':'#a0aec0'
+};
+
+function makeIcon(type, name) {
+  const color = pinColors[type] || '#a0aec0';
+  const tc = typeColors[type] || typeColors['أخرى'];
+  const html = `<div class="map-marker-wrap">
+    <div class="map-marker-pin" style="background:${color}"><span>${tc.emoji}</span></div>
+    <div class="map-marker-label">${name}</div>
+  </div>`;
+  return L.divIcon({ html, className:'', iconSize:[38,52], iconAnchor:[19,52], popupAnchor:[0,-54] });
+}
+
+// ---- MAIN MAP PAGE ----
+function initMainMap() {
+  const container = document.getElementById('mainMapContainer');
+  if (!container) return;
+
+  if (mainMap) { mainMap.remove(); mainMap = null; }
+
+  mainMap = L.map('mainMapContainer', { zoomControl:true, attributionControl:true });
+  L.tileLayer(TILE_URL, { attribution: TILE_ATTR, maxZoom:19 }).addTo(mainMap);
+  mainMap.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+
+  renderMapMarkers();
+}
+
+function renderMapMarkers() {
+  if (!mainMap) return;
+  mainMarkers.forEach(m => m.remove());
+  mainMarkers = [];
+
+  const cur = DB.settings.currency;
+  const contacts = DB.contacts.filter(c =>
+    c.lat && c.lng && (mapTypeFilter === 'all' || c.type === mapTypeFilter)
+  );
+
+  let forCount = 0, onCount = 0;
+
+  contacts.forEach(c => {
+    const bal = getContactBalance(c.id);
+    if (bal.net > 0) forCount++;
+    else if (bal.net < 0) onCount++;
+
+    const marker = L.marker([c.lat, c.lng], { icon: makeIcon(c.type, c.name) }).addTo(mainMap);
+    const balColor = bal.net >= 0 ? '#48bb78' : '#fc8181';
+    const balLabel = bal.net >= 0 ? 'لي منه' : 'علي له';
+    marker.bindPopup(`
+      <div style="font-family:'Cairo',sans-serif;direction:rtl;min-width:180px;">
+        <div class="map-popup-name">${c.name}</div>
+        <div class="map-popup-type" style="background:${pinColors[c.type]||'#666'}22;color:${pinColors[c.type]||'#aaa'}">${c.type}</div>
+        <div class="map-popup-bal" style="color:${balColor}">${balLabel}: ${Math.abs(bal.net).toFixed(2)} ${cur}</div>
+        ${c.phone ? `<div style="font-size:12px;color:#a0aec0;margin-bottom:8px;">📞 ${c.phone}</div>` : ''}
+        ${c.locationText ? `<div style="font-size:11px;color:#718096;margin-bottom:8px;">📍 ${c.locationText}</div>` : ''}
+        <div class="map-popup-btns">
+          <button class="map-popup-btn" style="background:#48bb7822;color:#48bb78;" onclick="closeModal('x');_mapWhatsapp('${c.id}')">💬</button>
+          <button class="map-popup-btn" style="background:#63b3ed22;color:#63b3ed;" onclick="_mapCall('${c.id}')">📞</button>
+          <button class="map-popup-btn" style="background:#f6c90e22;color:#f6c90e;" onclick="_mapEdit('${c.id}')">✏️</button>
+          <button class="map-popup-btn" style="background:#b794f422;color:#b794f4;" onclick="_mapNav('${c.lat||0}','${c.lng||0}')">🧭</button>
+        </div>
+      </div>`, { maxWidth: 220 });
+    mainMarkers.push(marker);
+  });
+
+  setText('mapTotalCount', contacts.length);
+  setText('mapForCount', forCount);
+  setText('mapOnCount', onCount);
+
+  if (contacts.length > 0) {
+    const bounds = L.latLngBounds(contacts.map(c => [c.lat, c.lng]));
+    mainMap.fitBounds(bounds, { padding:[60,60], maxZoom:14 });
+  }
+}
+
+function filterMapByType(el, type) {
+  document.querySelectorAll('#mapFilterChips .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  mapTypeFilter = type;
+  renderMapMarkers();
+}
+
+function locateMe() {
+  if (!navigator.geolocation) { showToast('الموقع غير مدعوم', 'error'); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    mainMap && mainMap.setView([pos.coords.latitude, pos.coords.longitude], 15);
+    showToast('تم تحديد موقعك 📡', 'success');
+  }, () => showToast('تعذّر تحديد الموقع', 'error'));
+}
+
+function filterMapType() { showToast('استخدم الأزرار أعلاه للتصفية', 'success'); }
+
+// ---- MAP PICKER ----
+function openMapPicker() {
+  openModal('mapPickerModal');
+  setTimeout(() => initPickerMap(), 200);
+}
+
+function initPickerMap() {
+  const container = document.getElementById('mapPickerDiv');
+  if (!container) return;
+  if (pickerMap) { pickerMap.remove(); pickerMap = null; }
+
+  const savedLat = parseFloat(document.getElementById('cLat').value);
+  const savedLng = parseFloat(document.getElementById('cLng').value);
+  const center = (savedLat && savedLng) ? [savedLat, savedLng] : DEFAULT_CENTER;
+
+  pickerMap = L.map('mapPickerDiv', { zoomControl:true, attributionControl:false });
+  L.tileLayer(TILE_URL, { maxZoom:19 }).addTo(pickerMap);
+  pickerMap.setView(center, savedLat ? 15 : DEFAULT_ZOOM);
+
+  pickerMap.on('move', updatePickerInfo);
+  pickerMap.on('moveend', reverseGeocode);
+  updatePickerInfo();
+}
+
+function updatePickerInfo() {
+  if (!pickerMap) return;
+  const c = pickerMap.getCenter();
+  const coordsEl = document.getElementById('pickerCoords');
+  if (coordsEl) coordsEl.textContent = `${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;
+}
+
+function reverseGeocode() {
+  if (!pickerMap) return;
+  const c = pickerMap.getCenter();
+  fetch(`https://nominatim.openstreetmap.org/reverse?lat=${c.lat}&lon=${c.lng}&format=json&accept-language=ar`)
+    .then(r => r.json())
+    .then(data => {
+      const addr = data.display_name || `${c.lat.toFixed(4)}, ${c.lng.toFixed(4)}`;
+      const infoEl = document.getElementById('pickerLocationInfo');
+      if (infoEl) infoEl.textContent = addr;
+      // Store for confirm
+      pickerMap._resolvedAddress = addr;
+    }).catch(() => {
+      const infoEl = document.getElementById('pickerLocationInfo');
+      if (infoEl) infoEl.textContent = `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+    });
+}
+
+function confirmMapLocation() {
+  if (!pickerMap) return;
+  const c = pickerMap.getCenter();
+  const addr = pickerMap._resolvedAddress || `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+  document.getElementById('cLat').value = c.lat;
+  document.getElementById('cLng').value = c.lng;
+  const existingText = document.getElementById('cLocationText').value.trim();
+  if (!existingText) document.getElementById('cLocationText').value = addr;
+  showLocationPreview(c.lat, c.lng, document.getElementById('cLocationText').value);
+  closeModal('mapPickerModal');
+  showToast('تم تحديد الموقع ✅', 'success');
+}
+
+function searchMapLocation() {
+  const q = document.getElementById('mapSearchInput').value.trim();
+  if (!q) return;
+  fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&accept-language=ar`)
+    .then(r => r.json())
+    .then(results => {
+      const res = document.getElementById('mapSearchResults');
+      if (!res) return;
+      if (!results.length) { res.style.display='block'; res.innerHTML=`<div style="padding:12px;text-align:center;color:var(--text3);font-size:13px;">لا توجد نتائج</div>`; return; }
+      res.style.display = 'block';
+      res.innerHTML = results.map(r => `
+        <div onclick="selectSearchResult(${r.lat},${r.lon},'${(r.display_name||'').replace(/'/g,'').slice(0,60)}')"
+             style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border2);font-size:13px;transition:background 0.15s;"
+             onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''"
+        >📍 ${r.display_name?.slice(0,60)||''}</div>`).join('');
+    }).catch(() => showToast('خطأ في البحث', 'error'));
+}
+
+function selectSearchResult(lat, lng, name) {
+  if (!pickerMap) return;
+  pickerMap.setView([lat, lng], 16);
+  document.getElementById('mapSearchResults').style.display = 'none';
+  document.getElementById('mapSearchInput').value = name;
+  pickerMap._resolvedAddress = name;
+  document.getElementById('pickerLocationInfo').textContent = name;
+}
+
+function detectPickerLocation() {
+  if (!navigator.geolocation) { showToast('الموقع غير مدعوم', 'error'); return; }
+  showToast('جاري تحديد الموقع... 📡', 'success');
+  navigator.geolocation.getCurrentPosition(pos => {
+    if (pickerMap) pickerMap.setView([pos.coords.latitude, pos.coords.longitude], 16);
+  }, () => showToast('تعذّر تحديد الموقع', 'error'));
+}
+
+// ---- LOCATION PREVIEW (thumbnail in form) ----
+function showLocationPreview(lat, lng, label) {
+  const preview = document.getElementById('cLocationPreview');
+  const labelEl = document.getElementById('cLocationLabel');
+  const mapDiv = document.getElementById('cLocationMapThumb');
+  if (!preview || !mapDiv) return;
+  preview.style.display = 'block';
+  if (labelEl) labelEl.textContent = label || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  // Destroy old
+  if (thumbMaps['cThumb']) { thumbMaps['cThumb'].remove(); delete thumbMaps['cThumb']; }
+  setTimeout(() => {
+    const m = L.map('cLocationMapThumb', { zoomControl:false, dragging:false, scrollWheelZoom:false, attributionControl:false });
+    L.tileLayer(TILE_URL, { maxZoom:18 }).addTo(m);
+    m.setView([lat, lng], 15);
+    L.marker([lat, lng]).addTo(m);
+    thumbMaps['cThumb'] = m;
+  }, 100);
+}
+
+function hideLocationPreview() {
+  const preview = document.getElementById('cLocationPreview');
+  if (preview) preview.style.display = 'none';
+  if (thumbMaps['cThumb']) { thumbMaps['cThumb'].remove(); delete thumbMaps['cThumb']; }
+}
+
+function clearLocation() {
+  document.getElementById('cLat').value = '';
+  document.getElementById('cLng').value = '';
+  document.getElementById('cLocationText').value = '';
+  hideLocationPreview();
+}
+
+function detectMyLocation() {
+  if (!navigator.geolocation) { showToast('الموقع غير مدعوم في متصفحك', 'error'); return; }
+  showToast('جاري تحديد موقعك... 📡', 'success');
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude: lat, longitude: lng } = pos.coords;
+    document.getElementById('cLat').value = lat;
+    document.getElementById('cLng').value = lng;
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=ar`)
+      .then(r => r.json())
+      .then(data => {
+        const addr = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        const shortAddr = addr.split(',').slice(0,3).join(',');
+        document.getElementById('cLocationText').value = shortAddr;
+        showLocationPreview(lat, lng, shortAddr);
+        showToast('تم تحديد موقعك ✅', 'success');
+      }).catch(() => {
+        document.getElementById('cLocationText').value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        showLocationPreview(lat, lng, '');
+        showToast('تم تحديد موقعك ✅', 'success');
+      });
+  }, err => showToast('تعذّر الحصول على الموقع', 'error'));
+}
+
+// ---- CONTACT MAP VIEW ----
+function openContactMapView() {
+  const c = DB.contacts.find(x => x.id === currentContactId);
+  if (!c) return;
+  if (!c.lat || !c.lng) { showToast('لا يوجد موقع محفوظ لهذه الجهة', 'error'); return; }
+  closeModal('contactDetailModal');
+  currentMapContactId = currentContactId;
+  document.getElementById('cmTitle').textContent = `📍 موقع ${c.name}`;
+  const infoEl = document.getElementById('cmInfo');
+  if (infoEl) infoEl.textContent = c.locationText || `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+  openModal('contactMapModal');
+  setTimeout(() => {
+    if (contactMapInst) { contactMapInst.remove(); contactMapInst = null; }
+    contactMapInst = L.map('contactMapDiv', { zoomControl:true, attributionControl:false });
+    L.tileLayer(TILE_URL, { maxZoom:19 }).addTo(contactMapInst);
+    contactMapInst.setView([c.lat, c.lng], 15);
+    L.marker([c.lat, c.lng], { icon: makeIcon(c.type, c.name) }).addTo(contactMapInst)
+      .bindPopup(`<div style="font-family:'Cairo',sans-serif;direction:rtl;"><b>${c.name}</b><br>${c.type}</div>`).openPopup();
+  }, 200);
+}
+
+function openInGoogleMaps() {
+  const c = DB.contacts.find(x => x.id === currentMapContactId);
+  if (!c || !c.lat) return;
+  window.open(`https://www.google.com/maps?q=${c.lat},${c.lng}`, '_blank');
+}
+
+function getDirections() {
+  const c = DB.contacts.find(x => x.id === currentMapContactId);
+  if (!c || !c.lat) return;
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`, '_blank');
+}
+
+// ---- MAP POPUP ACTIONS ----
+function _mapWhatsapp(id) {
+  currentContactId = id; whatsappContact();
+}
+function _mapCall(id) {
+  const c = DB.contacts.find(x => x.id === id);
+  if (c && c.phone) window.location.href = `tel:${c.phone}`;
+}
+function _mapEdit(id) {
+  if (mainMap) mainMap.closePopup();
+  showAddContact(id);
+}
+function _mapNav(lat, lng) {
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+}
+
+// Hook showPage for map
+const _origShowPage = showPage;
+showPage = function(page) {
+  _origShowPage(page);
+  if (page === 'map') {
+    setTimeout(() => initMainMap(), 150);
+  }
+};
+
+// (dropdown outside-click is handled per-instance in SearchableDropdown.open)
+</script>
+<script>
+const API_URL = "http://127.0.0.1:8000";
+
+async function doRegister(){
+
+    const full_name = document.getElementById("regName").value;
+    const phone = document.getElementById("regPhone").value;
+    const password = document.getElementById("regPass").value;
+    const password2 = document.getElementById("regPass2").value;
+
+    if(password !== password2){
+        alert("كلمات المرور غير متطابقة");
+        return;
+    }
+
+    const res = await fetch(`${API_URL}/auth/register`, {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            full_name,
+            phone,
+            password
+        })
+    });
+
+    const data = await res.json();
+
+    if(data.access_token || res.ok){
+        showToast("تم إنشاء الحساب", "success");
+    }else{
+        alert(data.detail || "فشل إنشاء الحساب");
+    }
+}
+
+async function doLogin(){
+
+    const phone = document.getElementById("loginPhone").value;
+    const password = document.getElementById("loginPass").value;
+
+    const formData = new FormData();
+    formData.append("username", phone);
+    formData.append("password", password);
+
+    const res = await fetch(`${API_URL}/auth/login`, {
+        method:"POST",
+        body:formData
+    });
+
+    const data = await res.json();
+
+    if(data.access_token){
+
+        localStorage.setItem("token", data.access_token);
+
+        await loadMe();
+        await loadContactsAPI();
+        await loadTransactionsAPI();
+
+        document.getElementById("login").classList.remove("active");
+        document.getElementById("app").classList.add("active");
+
+        showToast("تم تسجيل الدخول", "success");
+
+    }else{
+        alert("فشل تسجيل الدخول");
+    }
+}
+
+async function loadMe(){
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${API_URL}/me`, {
+        headers:{
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    const user = await res.json();
+
+    if(document.getElementById("welcomeName")){
+        document.getElementById("welcomeName").innerText = user.full_name;
+    }
+
+    if(document.getElementById("settingsName")){
+        document.getElementById("settingsName").innerText = user.full_name;
+    }
+
+    if(document.getElementById("settingsPhone")){
+        document.getElementById("settingsPhone").innerText = user.phone;
+    }
+
+    const firstLetter = user.full_name.charAt(0);
+
+    if(document.getElementById("userAvatar")){
+        document.getElementById("userAvatar").innerText = firstLetter;
+    }
+
+    if(document.getElementById("settingsAvatar")){
+        document.getElementById("settingsAvatar").innerText = firstLetter;
+    }
+}
+
+async function loadContactsAPI(){
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${API_URL}/contacts`, {
+        headers:{
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    const data = await res.json();
+
+    window.contacts = data;
+
+    if(typeof renderContacts === "function"){
+        renderContacts();
+    }
+}
+
+async function loadTransactionsAPI(){
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${API_URL}/transactions`, {
+        headers:{
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    const data = await res.json();
+
+    window.transactions = data;
+
+    if(typeof renderTransactions === "function"){
+        renderTransactions();
+    }
+
+    if(typeof updateDashboard === "function"){
+        updateDashboard();
+    }
+}
+</script>
+</body>
+</html>
