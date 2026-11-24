@@ -166,7 +166,7 @@ document.addEventListener("click",async e=>{
 });
 document.addEventListener("change",e=>{const el=e.target;
  if(el.id==="f_status"){A.f.status=el.value;render()}else if(el.id==="f_type"){A.f.type=el.value;render()}else if(el.id==="f_role"){A.f.role=el.value;render()}
- else if(el.dataset.role){const id=el.dataset.role,role=el.value;if(role==="engineer"){toast("اعتماد المهندسين يتم من بوابة المهندسين ← الإدارة ← طلبات الانضمام، بعد أن يقدّم المهندس طلبه هناك.",true);render();return}run(()=>API.users.setRole(id,role),"تم تغيير الدور.")}
+ else if(el.dataset.role){const id=el.dataset.role,role=el.value;if(role==="engineer"){render();toast("اعتماد المهندسين يتم من بوابة المهندسين ← الإدارة ← طلبات الانضمام، بعد أن يقدّم المهندس طلبه هناك.",true);return}run(()=>API.users.setRole(id,role),"تم تغيير الدور.")}
 });
 let qt=null;document.addEventListener("input",e=>{if(e.target.id==="f_q"){clearTimeout(qt);qt=setTimeout(()=>{A.f.q=e.target.value.trim();render()},250)}});
 
