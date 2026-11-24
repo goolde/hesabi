@@ -65,7 +65,7 @@ function vDash(){const {requests:R,ads,jobs:J,offices:O,users:U,subs,certs}=A.da
  <div class="row-acts" style="margin-top:14px"><button class="btn" data-exp="requests">تصدير الطلبات (Excel)</button><button class="btn ghost" data-exp="users">تصدير المستخدمين</button><button class="btn ghost" data-exp="jobs">تصدير الوظائف</button><button class="btn ghost" data-exp="certs">تصدير الشهادات</button><button class="btn ghost" data-exp="subs">تصدير المشتركين</button></div>`}
 
 function vRequests(){const f=A.f;let R=A.data.requests.filter(r=>(!f.status||r.status===f.status)&&(!f.type||r.type===f.type)&&(!f.q||(r.name+" "+(r.company||"")+" "+(r.phone||"")+" "+(r.product||"")).includes(f.q)));
- return `<div class="filters5"><input id="f_q" placeholder="بحث بالاسم أو المنشأة أو الجوال" value="${esc(f.q)}"><select id="f_status"><option value="">كل الحالات</option>${Object.entries(STAT).map(([k,v])=>`<option value="${k}" ${k===f.status?"selected":""}>${v[0]}</option>`).join("")}</select><select id="f_type"><option value="">كل الأنواع</option>${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${k===f.type?"selected":""}>${v}</option>`).join("")}</select><button class="btn sm ghost" data-exp="requests">تصدير</button></div>
+ return `<p class="fine">لترقية مهندس صيانة: يسجّل المهندس من <a href="engineers.html">بوابة المهندسين</a> ويقدّم طلب انضمام، ثم تعتمده أنت من هناك (الإدارة ← طلبات الانضمام).</p><div class="filters5"><input id="f_q" placeholder="بحث بالاسم أو المنشأة أو الجوال" value="${esc(f.q)}"><select id="f_status"><option value="">كل الحالات</option>${Object.entries(STAT).map(([k,v])=>`<option value="${k}" ${k===f.status?"selected":""}>${v[0]}</option>`).join("")}</select><select id="f_type"><option value="">كل الأنواع</option>${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${k===f.type?"selected":""}>${v}</option>`).join("")}</select><button class="btn sm ghost" data-exp="requests">تصدير</button></div>
  <div class="tablewrap"><table class="adm"><thead><tr><th>التاريخ</th><th>النوع / المنتج</th><th>العميل</th><th>التفاصيل</th><th>الحالة والإجراء</th></tr></thead><tbody>${R.map(r=>`<tr>
  <td>${when(r.at)}</td><td><b>${esc(TYPES[r.type]||r.type)}</b><br>${esc(r.product||"")}</td>
  <td>${esc(r.name)}<br>${esc(r.company||"")}<br><span dir="ltr">${esc(r.phone||"")}</span><br><span dir="ltr">${esc(r.email||"")}</span><br>${esc(r.city||"")}${r.owner?`<br><span class="chip">حساب مسجل</span>`:`<br><span class="chip">زائر</span>`}</td>
@@ -166,7 +166,7 @@ document.addEventListener("click",async e=>{
 });
 document.addEventListener("change",e=>{const el=e.target;
  if(el.id==="f_status"){A.f.status=el.value;render()}else if(el.id==="f_type"){A.f.type=el.value;render()}else if(el.id==="f_role"){A.f.role=el.value;render()}
- else if(el.dataset.role){const id=el.dataset.role,role=el.value;run(()=>API.users.setRole(id,role),"تم تغيير الدور.")}
+ else if(el.dataset.role){const id=el.dataset.role,role=el.value;if(role==="engineer"){toast("اعتماد المهندسين يتم من بوابة المهندسين ← الإدارة ← طلبات الانضمام، بعد أن يقدّم المهندس طلبه هناك.",true);render();return}run(()=>API.users.setRole(id,role),"تم تغيير الدور.")}
 });
 let qt=null;document.addEventListener("input",e=>{if(e.target.id==="f_q"){clearTimeout(qt);qt=setTimeout(()=>{A.f.q=e.target.value.trim();render()},250)}});
 
