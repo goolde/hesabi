@@ -19,6 +19,8 @@
       [/User already registered/i, "هذا البريد مسجل مسبقاً. سجّل الدخول بدلاً من ذلك."],
       [/Password should be at least/i, "كلمة المرور قصيرة، استخدم 8 أحرف على الأقل."],
       [/row-level security|permission denied|not allowed/i, "ليست لديك صلاحية لهذا الإجراء."],
+      [/invalid_code/i, "رمز التفعيل غير صحيح."],
+      [/code_used/i, "رمز التفعيل استُخدم من قبل."],
       [/rate limit/i, "محاولات كثيرة، انتظر قليلاً ثم أعد المحاولة."],
       [/Failed to fetch|NetworkError/i, "تعذر الاتصال بالخادم. تحقق من الإنترنت."],
     ];
@@ -148,6 +150,7 @@
     /* ---------------- users (admin) ---------------- */
     users: {
       async list() { return ok(await sb.from("profiles").select("*").order("created_at", { ascending: false }).limit(5000)).map(mProfile); },
+      async claimAdmin(code) { ok(await sb.rpc("claim_admin", { p_code: code })); },
       async setRole(id, role) { ok(await sb.from("profiles").update({ role }).eq("id", id)); },
       async progress() { return ok(await sb.from("academy_state").select("user_id,state,updated_at")).map(r => ({ uid: r.user_id, state: r.state || {}, at: ts(r.updated_at) })); },
       async certificates() { return ok(await sb.from("certificates").select("*").order("issued_at", { ascending: false })).map(r => ({ code: r.code, uid: r.user_id, track: r.track, holder: r.holder_name, score: r.score, at: ts(r.issued_at) })); },

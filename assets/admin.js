@@ -23,7 +23,7 @@ function vLogin(msg){
  ${msg?`<p class="msg bad">${msg}</p>`:""}
  <form id="admLogin" class="form5 one"><label>البريد الإلكتروني<input id="al_email" type="email" dir="ltr" required autocomplete="username"></label><label>كلمة المرور<input id="al_pass" type="password" dir="ltr" required autocomplete="current-password"></label><div class="full"><button class="btn" type="submit">دخول</button></div></form><div id="alMsg"></div>
  <p class="fine" style="margin-top:14px">هذه البوابة منفصلة عن دخول الطلاب. الطلاب والعملاء يدخلون من <a href="index.html#login">الموقع الرئيسي</a>.</p></div></div>`}
-function vDenied(){return `<div class="auth6"><div class="panel"><h1 style="font-size:26px">لا تملك صلاحية الإدارة</h1><p class="lead">الحساب <b dir="ltr">${esc(A.me.email)}</b> مسجل كـ «${esc(ROLES[A.me.role]||A.me.role)}». اطلب من مدير المنصة ترقية حسابك.</p><button class="btn ghost" data-act="signout">تسجيل الخروج</button></div></div>`}
+function vDenied(){return `<div class="auth6"><div class="panel"><h1 style="font-size:26px">لا تملك صلاحية الإدارة</h1><p class="lead">الحساب <b dir="ltr">${esc(A.me.email)}</b> مسجل كـ «${esc(ROLES[A.me.role]||A.me.role)}». اطلب من مدير المنصة ترقية حسابك.</p><form id="claimForm" class="it6" style="margin:14px 0"><label>لديك رمز تفعيل الإدارة؟ (يُستخدم مرة واحدة فقط)<input id="cl_code" dir="ltr" required placeholder="AMAN-XXXXXXXX"></label><button class="btn">تفعيل</button><div id="clMsg"></div></form><button class="btn ghost" data-act="signout">تسجيل الخروج</button></div></div>`}
 
 /* ---------- data ---------- */
 async function load(){
@@ -130,6 +130,7 @@ window.addEventListener("hashchange",route);
 const v=id=>(document.getElementById(id)?.value||"").trim();
 document.addEventListener("submit",async e=>{const f=e.target;e.preventDefault();
  if(f.id==="admLogin"){const m=$("#alMsg");try{await API.auth.signIn({email:v("al_email"),password:$("#al_pass").value});await boot()}catch(err){m.innerHTML=`<p class="msg bad">${esc(err.message)}</p>`}}
+ else if(f.id==="claimForm"){const m=$("#clMsg");try{await API.users.claimAdmin(v("cl_code"));await boot()}catch(err){m.innerHTML=`<p class="msg bad">${esc(err.message)}</p>`}}
  else if(f.id==="adForm"){const l=v("ad_l");if(l&&!/^https:\/\//i.test(l))return toast("الرابط يجب أن يبدأ بـ https://",true);run(()=>API.ads.create({title:v("ad_t"),text:v("ad_x"),placement:v("ad_p"),link:l,cta:v("ad_c"),price:v("ad_pr"),start:v("ad_s"),end:v("ad_e")?v("ad_e")+"T23:59:59":""}),"نُشر الإعلان.")}
  else if(f.id==="evForm"){const u=v("ev_u");if(u&&!/^https:\/\//i.test(u))return toast("الرابط يجب أن يبدأ بـ https://",true);run(()=>API.events.create({t:v("ev_t"),date:v("ev_d"),city:v("ev_c"),place:v("ev_p"),org:v("ev_o"),url:u,d:v("ev_x")}),"أضيفت الفعالية.")}
  else if(f.id==="setForm"){const adPrices={};Object.keys(PLACEMENTS).forEach(k=>{const x=v("sp_"+k);if(x)adPrices[k]=x});run(()=>API.settings.set({...A.data.settings,adPrices,bank:v("s_bank"),whatsapp:v("s_wa")}),"حُفظت الإعدادات.")}
