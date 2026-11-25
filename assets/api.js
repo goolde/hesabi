@@ -21,6 +21,8 @@
       [/row-level security|permission denied|not allowed/i, "ليست لديك صلاحية لهذا الإجراء."],
       [/invalid_code/i, "رمز التفعيل غير صحيح."],
       [/code_used/i, "رمز التفعيل استُخدم من قبل."],
+      [/mime type|not supported/i, "نوع الملف غير مسموح. المسموح: صور PNG/JPG/WebP/GIF وفيديو MP4/WebM وPDF."],
+      [/exceeded the maximum allowed size|Payload too large/i, "حجم الملف أكبر من المسموح (50 ميغابايت)."],
       [/rate limit/i, "محاولات كثيرة، انتظر قليلاً ثم أعد المحاولة."],
       [/Failed to fetch|NetworkError/i, "تعذر الاتصال بالخادم. تحقق من الإنترنت."],
     ];
@@ -127,6 +129,26 @@
     },
 
     /* ---------------- site settings ---------------- */
+    content: {
+      async all() {
+        if (!sb) return {};
+        const rows = ok(await sb.from("site_content").select("key,title,mode,blocks,updated_at"));
+        const o = {}; (rows || []).forEach(r => { o[r.key] = { title: r.title || "", mode: r.mode || "append", blocks: Array.isArray(r.blocks) ? r.blocks : [], at: Date.parse(r.updated_at) }; });
+        return o;
+      },
+      async save(key, { title, mode, blocks }) { need(); ok(await sb.from("site_content").upsert({ key, title, mode, blocks })); },
+      async remove(key) { need(); ok(await sb.from("site_content").delete().eq("key", key)); },
+      async upload(file) {
+        need();
+        if (file.size > 50 * 1024 * 1024) throw new Error("حجم الملف أكبر من 50 ميغابايت. للفيديوهات الطويلة ارفعها على يوتيوب وضع رابطها.");
+        const ext = ((file.name || "").split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 5) || "bin";
+        const id = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+        const path = new Date().toISOString().slice(0, 7) + "/" + id + "." + ext;
+        ok(await sb.storage.from("media").upload(path, file, { contentType: file.type, upsert: false }));
+        return sb.storage.from("media").getPublicUrl(path).data.publicUrl;
+      },
+    },
+
     settings: {
       async get() { if (!sb) return {}; const r = ok(await sb.from("settings").select("value").eq("key", "site").maybeSingle()); return r ? r.value : {}; },
       async set(v) { ok(await sb.from("settings").upsert({ key: "site", value: v, updated_at: new Date().toISOString() })); },

@@ -43,7 +43,7 @@ async function run(fn,okMsg){try{await fn();await reload();if(okMsg)toast(okMsg)
 const userName=id=>{const u=A.data.users.find(x=>x.id===id);return u?(u.name||u.email):""};
 
 /* ---------- tabs ---------- */
-const TABS=[["dash","المؤشرات والتقارير"],["requests","الطلبات"],["ads","الإعلانات"],["jobs","الوظائف"],["offices","المكاتب"],["events","الفعاليات"],["users","المستخدمون"],["academy","الأكاديمية"],["subs","النشرة"],["settings","الإعدادات"],["guide","دليل التشغيل"]];
+const TABS=[["dash","المؤشرات والتقارير"],["requests","الطلبات"],["ads","الإعلانات"],["jobs","الوظائف"],["offices","المكاتب"],["events","الفعاليات"],["users","المستخدمون"],["academy","الأكاديمية"],["content","المحتوى والفيديوهات"],["subs","النشرة"],["settings","الإعدادات"],["guide","دليل التشغيل"]];
 function tabs(){const pend=A.data.offices.filter(o=>o.status==="pending").length,newR=A.data.requests.filter(r=>r.status==="new").length;
  return `<div class="tabs5">${TABS.map(([k,t])=>`<a href="#${k}" class="${A.tab===k?"on":""}">${t}${k==="requests"&&newR?` <span class="chip warn">${newR}</span>`:""}${k==="offices"&&pend?` <span class="chip warn">${pend}</span>`:""}</a>`).join("")}</div>`}
 
@@ -118,7 +118,7 @@ function render(){
  if(!A.me){app.innerHTML=vLogin();return}
  if(A.me.role!=="admin"){app.innerHTML=vDenied();return}
  if(!A.loaded){app.innerHTML=`<p class="fine" style="margin-top:30px">جارٍ تحميل البيانات…</p>`;return}
- const V={dash:vDash,requests:vRequests,ads:vAds,jobs:vJobs,offices:vOffices,events:vEvents,users:vUsers,academy:vAcademy,subs:vSubs,settings:vSettings,guide:vGuide}[A.tab]||vDash;
+ const V={dash:vDash,requests:vRequests,ads:vAds,jobs:vJobs,offices:vOffices,events:vEvents,users:vUsers,academy:vAcademy,content:()=>window.ContentAdmin?ContentAdmin.view():"",subs:vSubs,settings:vSettings,guide:vGuide}[A.tab]||vDash;
  const a=document.activeElement,fid=a&&a.id&&app.contains(a)?a.id:null,pos=fid&&a.selectionStart;
  app.innerHTML=`<div class="sechead" style="margin-top:22px"><div><div class="eyebrow">بوابة الإدارة</div><h1 style="font-size:28px">لوحة إدارة المنصة</h1></div><div class="row-acts"><span class="fine" dir="ltr">${esc(A.me.email)}</span><button class="btn sm ghost" data-act="reload">تحديث</button><button class="btn sm ghost" data-act="signout">خروج</button></div></div>${tabs()}<div id="toast"></div>${V()}`;
  if(fid){const el=document.getElementById(fid);if(el){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}

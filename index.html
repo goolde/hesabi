@@ -499,6 +499,36 @@ nav.main a{white-space:nowrap;padding-inline:10px}
 .tabs5 a{text-decoration:none}
 .chip.warn{background:#fdecc8;color:#7a4a00}
 table.adm select,table.adm input{max-width:100%}
+/* ---- admin-edited content blocks ---- */
+.cb{margin-top:18px}
+.cb-h{margin-top:22px}
+.cb-fig{margin:16px 0}
+.cb-fig img,.cb-fig video{display:block;max-width:100%;height:auto;border-radius:12px;border:1px solid var(--line,#e5e5e5)}
+.cb-fig video{width:100%;background:#000}
+.cb-fig figcaption{font-size:13.5px;color:var(--muted);margin-top:6px}
+.cb-vid{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
+.cb-vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.cb-text p{margin:0 0 10px}
+.vsec{margin:26px 0}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.vgrid .cb-fig{margin:0}
+@media (max-width:520px){.vgrid{grid-template-columns:1fr}}
+/* ---- content editor (admin) ---- */
+.ce{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
+@media (max-width:860px){.ce{grid-template-columns:1fr}}
+.ce-list{max-height:75vh;overflow:auto}
+.ce-list details{margin:4px 0}
+.ce-list summary{cursor:pointer;font-weight:700;padding:6px 0}
+.ce-item{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:start;background:none;border:0;border-radius:8px;padding:7px 9px;cursor:pointer;font:inherit;color:inherit}
+.ce-item:hover{background:rgba(0,0,0,.05)}
+.ce-item.on{background:var(--brand,#7A2350);color:#fff}
+.ce-blk{border:1px solid var(--line,#e5e5e5);border-radius:12px;padding:12px;margin:10px 0;background:var(--card,transparent)}
+.ce-blk .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.ce-blk textarea{width:100%;min-height:160px;font:inherit;line-height:1.7}
+.ce-blk input[type=text],.ce-blk input[type=url]{width:100%}
+.ce-blk .prev{margin-top:8px;max-width:420px}
+.ce-help{font-size:13px;color:var(--muted)}
+.ce-prev{border:2px dashed var(--line,#ddd);border-radius:12px;padding:14px;margin-top:12px}
 </style>
 </head>
 <body>
@@ -509,6 +539,7 @@ table.adm select,table.adm input{max-width:100%}
       <a href="#home" data-r="home">الرئيسية</a>
       <a href="#products" data-r="products">الإصدارات</a>
       <a href="#academy" data-r="academy">الأكاديمية</a>
+      <a href="#videos" data-r="videos">الفيديوهات</a>
       <a href="#templates" data-r="templates">النماذج</a>
       <a href="#jobs" data-r="jobs">الوظائف</a>
       <a href="#events" data-r="events">الفعاليات</a>
@@ -926,12 +957,12 @@ const COURSES = [
   <div class="tbl"><table><thead><tr><th>الإصدار</th><th>النوع</th><th>الفئة المستهدفة</th></tr></thead><tbody>
   <tr><td><b>المحاسب الشامل</b></td><td>مكتبي</td><td>المنشآت الصغيرة والمتوسطة</td></tr>
   <tr><td><b>الشامل بلس</b></td><td>مكتبي متقدم</td><td>الشركات متعددة الفروع والمستودعات</td></tr>
-  <tr><td><b>الشامل ويب</b></td><td>سحابي عبر المتصفح</td><td>من يحتاج العمل من أي مكان</td></tr>
+  <tr><td><b>الشامل ويب</b> (المحاسب الشامل السحابي)</td><td>سحابي عبر المتصفح</td><td>من يحتاج العمل من أي مكان</td></tr>
   <tr><td><b>أولتكس</b></td><td>مكتبي اقتصادي</td><td>المنشآت التي تبحث عن حل بتكلفة أقل</td></tr>
   <tr><td><b>تروست ويب</b></td><td>ويب</td><td>الخصائص قيد التوثيق ${V}</td></tr>
   <tr><td><b>وصل ERP</b></td><td>نظام ERP</td><td>الخصائص قيد التوثيق ${V}</td></tr>
   <tr><td><b>وصل مطاعم</b></td><td>نظام للمطاعم</td><td>الخصائص قيد التوثيق ${V}</td></tr>
-  <tr><td><b>الشامل لايت</b></td><td>تطبيق جوال</td><td>مرتبط بالإصدارات المكتبية</td></tr>
+  <tr><td><b>الشامل لايت</b></td><td>تطبيق جوال</td><td>يرتبط مع المحاسب الشامل والشامل بلس والشامل ويب</td></tr>
   <tr><td><b>الشامل برو</b></td><td>تطبيق جوال</td><td>الوظائف قيد التوثيق ${V}</td></tr>
   </tbody></table></div>
   <p>تعمل النسخ المكتبية على Windows، ويعتمد المحاسب الشامل المكتبي على قاعدة بيانات Oracle، بحسب المعلومات المتوفرة ${V}. ويعمل الشامل ويب عبر المتصفح.</p>`,
@@ -2099,12 +2130,13 @@ const PRODUCTS=[
  {id:"shamel",fam:"desktop",name:"المحاسب الشامل",mono:"الشامل",c1:"#7A2350",c2:"#3E1230",col:0,tag:"ديسكتوب",tagline:"نظام ERP مكتبي متكامل للمنشآت الصغيرة والمتوسطة، يعمل دون إنترنت.",hi:["يعمل بدون إنترنت","إدارة فروع متعددة","نقاط بيع ونقطة بيع مطاعم","سجل تدقيق كامل"]},
  {id:"plus",fam:"desktop",name:"المحاسب الشامل بلس",mono:"الشامل بلس",c1:"#4E2A6B",c2:"#24123A",col:1,tag:"ديسكتوب متقدم",tagline:"للشركات متعددة الفروع والمستودعات، مع تحكم مركزي ولوحة مؤشرات.",hi:["تحكم مركزي كامل بالفروع","تسعير حسب العميل","إدارة مخزون متقدمة","مناسب للشركات الكبيرة"]},
  {id:"oltex",fam:"desktop",name:"أولتكس",logo:"oltex",c1:"#164E7E",c2:"#0B2540",col:2,tag:"ديسكتوب اقتصادي",pdf:"oltex",tagline:"نظام اقتصادي للأنشطة ذات الفرع الواحد، على Oracle Database 19c.",hi:["يعمل بدون إنترنت","احتساب هامش الربح تلقائياً","تقارير لحظية","دعم عملات وضرائب متعددة"]},
- {id:"shweb",fam:"web",name:"الشامل ويب",logo:"shweb",c1:"#2A7DB8",c2:"#123A63",col:3,tag:"سحابي",pdf:"shweb",tagline:"النسخة السحابية من الشامل لإدارة الفروع المتعددة من أي مكان.",hi:["نظام سحابي 100%","تسعير ذكي حسب العميل والمورد والفرع","تعديل سعر البيع من فاتورة الشراء","نقاط بيع تعمل دون إنترنت"]},
+ {id:"shweb",fam:"web",name:"الشامل ويب",logo:"shweb",c1:"#2A7DB8",c2:"#123A63",col:3,tag:"سحابي",pdf:"shweb",tagline:"النسخة السحابية من الشامل لإدارة الفروع المتعددة من أي مكان، وتُعرف أيضاً باسم «المحاسب الشامل السحابي (كلاود)»: منتج واحد.",hi:["نظام سحابي 100%","تسعير ذكي حسب العميل والمورد والفرع","تعديل سعر البيع من فاتورة الشراء","نقاط بيع تعمل دون إنترنت"]},
  {id:"trust",fam:"web",name:"تروست المحاسبي",logo:"trust",c1:"#0E4D6B",c2:"#071F33",col:4,tag:"سحابي",pdf:"trust",tagline:"نظام محاسبي سحابي للمنشآت والمخازن الصغيرة ومتناهية الصغر.",hi:["نظام سحابي","لوحة مؤشرات تنفيذية","سجل تدقيق كامل","مناسب للمحلات الصغيرة"]},
+ {id:"lite",fam:"apps",name:"الشامل لايت",mono:"الشامل لايت",c1:"#B4532A",c2:"#5A2410",tag:"تطبيق جوال",tagline:"تطبيق جوال يرتبط مع المحاسب الشامل والشامل بلس والشامل ويب، لمتابعة منشأتك من الجوال.",hi:["يرتبط مع المحاسب الشامل","يرتبط مع الشامل بلس","يرتبط مع الشامل ويب"]},
  {id:"wasl-erp",fam:"wasl",name:"وصل ERP",mono:"وصل ERP",c1:"#1F6F5C",c2:"#0D3329",tag:"قيد التوثيق",tagline:"منتج ERP ضمن محفظة أمان الحديثة. الخصائص والتسعير قيد التوثيق.",hi:[]},
  {id:"wasl-rest",fam:"wasl",name:"وصل مطاعم",mono:"وصل مطاعم",c1:"#8A4B12",c2:"#3D2008",tag:"قيد التوثيق",tagline:"منتج للمطاعم ضمن محفظة أمان الحديثة. الخصائص والتسعير قيد التوثيق.",hi:[]},
 ];
-const FAMS=[["desktop","الإصدارات المكتبية","تعمل على أجهزتك وشبكتك المحلية، مع طرفيات ونقاط بيع."],["web","الإصدارات السحابية","تعمل من المتصفح من أي مكان."],["wasl","منتجات وصل","حلول إضافية ضمن المحفظة."]];
+const FAMS=[["desktop","الإصدارات المكتبية","تعمل على أجهزتك وشبكتك المحلية، مع طرفيات ونقاط بيع."],["web","الإصدارات السحابية","تعمل من المتصفح من أي مكان."],["apps","تطبيقات الجوال","تطبيقات ترتبط بإصداراتك المكتبية والسحابية."],["wasl","منتجات وصل","حلول إضافية ضمن المحفظة."]];
 const P=id=>PRODUCTS.find(p=>p.id===id);
 const logoBox=(p,cls)=>p.logo?`<img src="logos/${p.logo}.png" alt="${p.name}">`:`<span class="${cls||"mono"}">${p.mono||p.name}</span>`;
 function pcard(p){return `<a class="pcard" href="#p-${p.id}" style="--c1:${p.c1};--c2:${p.c2}"><div class="band"><span class="tag">${p.tag}</span>${logoBox(p)}</div><div class="bd"><h3>${p.name}</h3><p>${p.tagline}</p>${p.hi.length?`<ul>${p.hi.map(h=>`<li>${h}</li>`).join("")}</ul>`:""}<span class="go">عرض التفاصيل والأدلة ←</span></div></a>`}
@@ -2336,7 +2368,7 @@ function adminGuide(){return `<div class="two"><div class="panel"><h3>الإعل
 
 /* ---------- home, events, academy (redesign) ---------- */
 function vHome(){live5();
- const tiles=[["#products",IC.folder,"إصدارات أمان الحديثة","الشامل، بلس، أولتكس، الويب، تروست، وصل: شرح وأدلة وعروض فنية.",`${PRODUCTS.length} إصدارات`],["#products",IC.doc,"حلول القطاعات","مصانع، مقاولات، وقود، صيدليات، ذهب، عقار، مطاعم، وغيرها.",`${SECTORS_ALL().length} قطاعاً`,"sectors"],["#academy",IC.cap,"أكاديمية المحاسبة","13 مرحلة متدرجة باختبارات وتمارين قيود وشهادات.",`${ACCT_TRACK.length+COURSES.length} مساقاً`],["#news",IC.news,"الأنظمة والقرارات","آخر قرارات الزكاة والضريبة والفوترة الإلكترونية.",`${NEWS.length} خبراً`],["#events",IC.cal,"المؤتمرات والدورات","الفعاليات القادمة وطريقة التسجيل.",`${EVENTS.length+L5.events.length} فعاليات`],["#calc",IC.calc,"الحاسبات","الضريبة، الاستقطاع، الزكاة، نهاية الخدمة وغيرها.",`${CALCS.length} حاسبة`],["#templates",IC.doc,"مكتبة النماذج","نماذج محاسبية وإدارية قابلة للتعديل والتنزيل.",`${TPL.length} نموذجاً`],["#jobs",IC.news,"الوظائف","انشر وظيفة أو فعّل تنبيه الوظائف.",`${allJobs().length} وظيفة`],["#offices",IC.award,"المكاتب المعتمدة","دليل المكاتب مع شارة «ثقة».",`${LIVE.offices.length} مكتباً`]];
+ const tiles=[["#products",IC.folder,"إصدارات أمان الحديثة","الشامل، بلس، أولتكس، الويب (السحابي)، لايت، تروست، وصل: شرح وأدلة وعروض فنية.",`${PRODUCTS.length} إصدارات`],["#products",IC.doc,"حلول القطاعات","مصانع، مقاولات، وقود، صيدليات، ذهب، عقار، مطاعم، وغيرها.",`${SECTORS_ALL().length} قطاعاً`,"sectors"],["#academy",IC.cap,"أكاديمية المحاسبة","13 مرحلة متدرجة باختبارات وتمارين قيود وشهادات.",`${ACCT_TRACK.length+COURSES.length} مساقاً`],["#news",IC.news,"الأنظمة والقرارات","آخر قرارات الزكاة والضريبة والفوترة الإلكترونية.",`${NEWS.length} خبراً`],["#events",IC.cal,"المؤتمرات والدورات","الفعاليات القادمة وطريقة التسجيل.",`${EVENTS.length+L5.events.length} فعاليات`],["#calc",IC.calc,"الحاسبات","الضريبة، الاستقطاع، الزكاة، نهاية الخدمة وغيرها.",`${CALCS.length} حاسبة`],["#templates",IC.doc,"مكتبة النماذج","نماذج محاسبية وإدارية قابلة للتعديل والتنزيل.",`${TPL.length} نموذجاً`],["#jobs",IC.news,"الوظائف","انشر وظيفة أو فعّل تنبيه الوظائف.",`${allJobs().length} وظيفة`],["#offices",IC.award,"المكاتب المعتمدة","دليل المكاتب مع شارة «ثقة».",`${LIVE.offices.length} مكتباً`]];
  const latest=[...NEWS].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,3);
  const ads=[...activeAds("home").map(adBanner),...ADS.map(a=>`<div class="ad5"><div><span class="lbl">من الأكاديمية</span><b>${a.t}</b><p>${a.p}</p></div><a class="btn sm" href="${a.href}">${a.cta}</a></div>`)].join("");
  return `<section class="hero5"><div style="position:relative;z-index:1"><div class="eyebrow">منصة أمان الحديثة لتقنية نظم المعلومات</div><h1>منصة المحاسب الشامل للتعليم والخدمات</h1><p>أدلة الإصدارات والقطاعات، أكاديمية محاسبة متدرجة بشهادات، الأنظمة السعودية أولاً بأول، الحاسبات والنماذج، والوظائف، وبوابة طلبات مباشرة.</p><div class="hero-actions"><a class="btn order" href="#order">اطلب خدمة أو عرض سعر</a><a class="btn ghost" href="#products">تصفح الإصدارات</a><a class="btn ghost" href="#academy">ابدأ التعلم</a></div></div>
@@ -2467,6 +2499,7 @@ go();
 <script src="assets/config.js"></script>
 <script src="assets/supabase.js"></script>
 <script src="assets/api.js"></script>
+<script src="assets/content.js"></script>
 <script>
 /* =====================================================================
    موقع الطلاب والعملاء: حسابات حقيقية عبر طبقة API (assets/api.js)
@@ -2486,10 +2519,38 @@ async function loadData(){
   .then(([jobs,ads,events,settings,offices,qa])=>{L5.jobs=jobs;L5.ads=ads;L5.events=events.map(e=>({id:e.id,t:e.t,org:e.org,date:e.date,where:[e.city,e.place].filter(Boolean).join(" · "),reg:e.d,link:e.url}));L5.settings=settings||{};LIVE.offices=offices;LIVE.qa=qa});
  const mine=ME6.uid?Promise.all([API.requests.mine(),API.alerts.mine(),API.notifications.list(),API.offices.mine()])
   .then(([reqs,alert,notes,office])=>{L5.myReq={items:reqs};L5.myAlert=alert;L5.notes=notes;LIVE.myReq=office&&office.status==="pending"?office:null}):Promise.resolve();
- try{await Promise.all([pub,mine]);LIVE.ready=true;LIVE.err="";L5.loaded=true}catch(e){LIVE.err="net";console.warn(e)}
+ const cont=API.content.all().then(c=>{CONTENT=c||{}}).catch(e=>console.warn(e));
+ try{await Promise.all([pub,mine,cont]);LIVE.ready=true;LIVE.err="";L5.loaded=true}catch(e){LIVE.err="net";console.warn(e)}
 }
 function refresh(){_loading=loadData().then(()=>{bell5();rerender6()});return _loading}
 function rerender6(){const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&$("#app").contains(a))return;keep(route)}
+
+/* ---------- content edited from the admin portal (text, images, videos) ---------- */
+let CONTENT={};
+const _vLesson6=vLesson;
+vLesson=function(id,i){const c=C(id),l=c&&c.lessons[i],ct=CONTENT["lesson:"+id+"-"+i];
+ if(!l||!ct||!ct.blocks.length)return _vLesson6(id,i);
+ const o=l.body,rep=ct.mode==="replace";
+ l.body=(rep?"":o)+`<section class="cb">${rep?"":`<h3 class="cb-h">شرح إضافي وفيديوهات</h3>`}${CB.render(ct.blocks)}</section>`;
+ try{return _vLesson6(id,i)}finally{l.body=o}};
+const _vProduct6=vProduct;
+vProduct=function(id){const ct=CONTENT["product:"+id];let h=_vProduct6(id);
+ if(!ct||!ct.blocks.length)return h;
+ const sel=ptab[id]==="vid",i=h.lastIndexOf('<nav class="tabs5">');if(i<0)return h;
+ const j=h.indexOf("</nav>",i);let nav=h.slice(i,j);if(sel)nav=nav.replace(/ class="on"/g,' class=""');
+ const nv=ct.blocks.filter(b=>b.type==="video").length;
+ nav+=`<button data-ptab="${id}:vid" class="${sel?"on":""}">الفيديوهات والشرح${nv?` <span class="cnt">${nv}</span>`:""}</button>`;
+ let rest=h.slice(j);if(sel){const k=rest.indexOf('<div class="tabpane">');rest=rest.slice(0,k)+`<div class="tabpane"><div class="panel cb">${CB.render(ct.blocks)}</div></div>`}
+ return h.slice(0,i)+nav+rest};
+document.addEventListener("click",e=>{const a=e.target.closest("[data-vtab]");if(a)ptab[a.dataset.vtab]="vid"},true);
+function vVideos(){
+ const vids=ct=>ct.blocks.filter(b=>b.type==="video"&&/^https:/.test(b.url||""));
+ const sec=[];
+ Object.entries(CONTENT).filter(([k,ct])=>k.startsWith("product:")&&vids(ct).length).forEach(([k,ct])=>{const id=k.slice(8),p=P(id);sec.push({t:p?p.name:ct.title,sub:"صفحة الإصدار",href:"#p-"+id,tab:id,v:vids(ct)})});
+ ALL_COURSES().forEach(c=>c.lessons.forEach((l,i)=>{const ct=CONTENT["lesson:"+c.id+"-"+i];if(ct&&vids(ct).length)sec.push({t:l.t,sub:c.title+" · الدرس "+(i+1),href:"#lesson-"+c.id+"-"+i,v:vids(ct)})}));
+ const n=sec.reduce((a,s)=>a+s.v.length,0);
+ return `<div class="sechead" style="margin-top:22px"><div><div class="eyebrow">الأكاديمية</div><h1 style="font-size:28px">مكتبة الفيديوهات</h1><p class="lead" style="margin:6px 0 0">كل فيديو مربوط بمكانه: صفحة الإصدار أو الدرس الذي يشرحه. ${n?n+" فيديو وقائمة تشغيل.":""}</p></div></div>
+ ${!L5.loaded&&!LIVE.err?`<p class="fine">جارٍ التحميل…</p>`:sec.length?sec.map(s=>`<section class="vsec"><div class="fam-head"><h2>${esc(s.t)}</h2><p>${esc(s.sub)} · <a href="${s.href}"${s.tab?` data-vtab="${s.tab}"`:""}>افتح المكان ←</a></p></div><div class="vgrid">${CB.render(s.v)}</div></section>`).join(""):`<div class="empty"><h3>لا توجد فيديوهات بعد</h3><p>تضيفها الإدارة من لوحة الإدارة ← المحتوى والفيديوهات.</p></div>`}`}
 
 /* ---------- replace the Claude-storage plumbing ---------- */
 liveStart=function(){};live5=function(){};
@@ -2574,6 +2635,7 @@ route=function(){
  else if(h==="#reset")html=vReset();
  else if(h==="#account")html=vAccount();
  else if(h==="#verify")html=vVerify(),nav="academy";
+ else if(h==="#videos")html=vVideos(),nav="videos";
  else if(GATED.test(h)&&ME6.ready&&!ME6.uid)html=needLogin(/^#(course|lesson|exam|cert)/.test(h)?"الأكاديمية":"هذه الصفحة"),nav=/^#(course|lesson|exam|cert)/.test(h)?"academy":"";
  if(html===null){_route6();bell5();return}
  $("#app").innerHTML=html;document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("on",a.dataset.r===nav));bell5();
