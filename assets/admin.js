@@ -29,7 +29,7 @@ function vDenied(){return `<div class="auth6"><div class="panel"><h1 style="font
 async function load(){
  const [requests,ads,jobs,offices,events,users,subs,settings,certs,alertsN]=await Promise.all([
   API.requests.all(),API.ads.all(),API.jobs.all(),API.offices.all(),API.events.list(),API.users.list(),API.subscribers.list(),API.settings.get(),API.users.certificates(),API.alerts.count()]);
- A.data={requests,ads,jobs,offices,events,users,subs,settings:settings||{},certs,alertsN};A.loaded=true;
+ A.data={requests,ads,jobs,offices,events,users,subs,settings:settings||{},certs,alertsN};A.loaded=true;if(window.THEME)THEME.apply((settings||{}).theme||null,true);
 }
 async function reload(){try{await load()}catch(e){toast(e.message,true)}render()}
 
@@ -105,7 +105,14 @@ function vSubs(){return `<div class="panel"><h3>مشتركو النشرة (${A.d
 function vSettings(){const s=A.data.settings;const p=s.adPrices||{};
  return `<div class="panel"><h3>إعدادات المنصة</h3><form id="setForm" class="form5">${Object.entries(PLACEMENTS).map(([k,v])=>`<label>سعر الإعلان أسبوعياً: ${v} (ريال)<input id="sp_${k}" inputmode="decimal" value="${esc(p[k]||"")}"></label>`).join("")}
  <label class="full">طريقة الدفع (تظهر للعميل عند «بانتظار الدفع»)<textarea id="s_bank" rows="2" maxlength="400">${esc(s.bank||"")}</textarea></label><label>رقم واتساب التواصل<input id="s_wa" dir="ltr" value="${esc(s.whatsapp||"")}"></label><div class="full"><button class="btn" type="submit">حفظ الإعدادات</button></div></form>
- <p class="fine">لا توجد أسعار افتراضية؛ الأسعار التي تكتبها هنا هي ما يراه المعلن.</p></div>`}
+ <p class="fine">لا توجد أسعار افتراضية؛ الأسعار التي تكتبها هنا هي ما يراه المعلن.</p></div>${vTheme()}`}
+function vTheme(){const T=window.THEME;if(!T)return "";const cur=A.data.settings.theme||T.PRESETS[0];
+ const sw=p=>`<button type="button" class="btn sm ghost" data-act="thpreset" data-id="${p.id}" title="${esc(p.name)}"><span style="display:inline-flex;gap:3px;vertical-align:middle;margin-inline-end:6px">${[p.navy,p.accent,p.gold].map(c=>`<i style="width:14px;height:14px;border-radius:4px;background:${c};display:inline-block"></i>`).join("")}</span>${esc(p.name)}</button>`;
+ return `<div class="panel" style="margin-top:16px"><h3>ألوان الموقع</h3><p class="fine">اختر مجموعة جاهزة أو حدّد الألوان بنفسك. تتغير هذه الصفحة فوراً للمعاينة، ولا تظهر للزوار إلا بعد «حفظ الألوان».</p>
+ <div class="row-acts" style="flex-wrap:wrap;margin:10px 0">${T.PRESETS.map(sw).join("")}</div>
+ <form id="themeForm" class="form5"><label>اللون الأساسي (الأزرار والروابط)<input type="color" id="th_a" value="${esc(cur.accent)}"></label><label>اللون الثانوي (الشارات والتمييز)<input type="color" id="th_g" value="${esc(cur.gold)}"></label><label>لون الشريط العلوي<input type="color" id="th_n" value="${esc(cur.navy)}"></label>
+ <div class="full row-acts"><button class="btn" type="submit">حفظ الألوان</button><button class="btn ghost" type="button" data-act="threset">الرجوع للألوان الافتراضية</button></div></form></div>`}
+const thVal=()=>({accent:v("th_a"),gold:v("th_g"),navy:v("th_n")});
 
 function vGuide(){return `<div class="two"><div class="panel"><h3>الإعلان المدفوع</h3><ol class="steps5"><li>المعلن يرسل طلب «إعلان مدفوع» من صفحة «اطلب خدمة».</li><li>يصلك إشعار، وتجد الطلب في «الطلبات». اكتب السعر والرد واجعل الحالة «بانتظار الدفع»، فيرى العميل السعر وطريقة الدفع في «طلباتي» ويصله إشعار.</li><li>بعد وصول التحويل اجعل الحالة «مدفوع» ثم اضغط «نشر الإعلان». ينشر في المكان والمدة المطلوبة ويختفي تلقائياً عند نهايتها.</li></ol></div>
  <div class="panel"><h3>الوظائف والتنبيهات</h3><ol class="steps5"><li>أي مستخدم مسجل ينشر وظيفة من صفحة الوظائف، وتنتهي تلقائياً بعد المدة المختارة.</li><li>من فعّل «تنبيه الوظائف» يصله إشعار فوري داخل المنصة عند نشر وظيفة تطابق كلماته أو مدينته.</li><li>من هنا تميّز الوظيفة أو تخفيها أو تحذفها.</li></ol></div>
@@ -133,6 +140,7 @@ document.addEventListener("submit",async e=>{const f=e.target;e.preventDefault()
  else if(f.id==="claimForm"){const m=$("#clMsg");try{await API.users.claimAdmin(v("cl_code"));await boot()}catch(err){m.innerHTML=`<p class="msg bad">${esc(err.message)}</p>`}}
  else if(f.id==="adForm"){const l=v("ad_l");if(l&&!/^https:\/\//i.test(l))return toast("الرابط يجب أن يبدأ بـ https://",true);run(()=>API.ads.create({title:v("ad_t"),text:v("ad_x"),placement:v("ad_p"),link:l,cta:v("ad_c"),price:v("ad_pr"),start:v("ad_s"),end:v("ad_e")?v("ad_e")+"T23:59:59":""}),"نُشر الإعلان.")}
  else if(f.id==="evForm"){const u=v("ev_u");if(u&&!/^https:\/\//i.test(u))return toast("الرابط يجب أن يبدأ بـ https://",true);run(()=>API.events.create({t:v("ev_t"),date:v("ev_d"),city:v("ev_c"),place:v("ev_p"),org:v("ev_o"),url:u,d:v("ev_x")}),"أضيفت الفعالية.")}
+ else if(f.id==="themeForm"){const t=thVal();if(!THEME.valid(t))return toast("لون غير صالح.",true);run(async()=>{await API.settings.set({...A.data.settings,theme:t});THEME.apply(t,true)},"حُفظت الألوان وظهرت للزوار.")}
  else if(f.id==="setForm"){const adPrices={};Object.keys(PLACEMENTS).forEach(k=>{const x=v("sp_"+k);if(x)adPrices[k]=x});run(()=>API.settings.set({...A.data.settings,adPrices,bank:v("s_bank"),whatsapp:v("s_wa")}),"حُفظت الإعدادات.")}
 });
 document.addEventListener("click",async e=>{
@@ -160,6 +168,8 @@ document.addEventListener("click",async e=>{
   case "oreject":run(()=>API.offices.update(id,{status:"rejected"}),"رُفض الطلب.");break;
   case "otrust":run(()=>API.offices.update(id,{verified:d.v==="1"}));break;
   case "odel":run(()=>API.offices.remove(id),"حُذف المكتب.");break;
+  case "thpreset":{const p=THEME.PRESETS.find(x=>x.id===d.id);if(!p)break;["a","g","n"].forEach((k,i)=>{const el=document.getElementById("th_"+k);if(el)el.value=[p.accent,p.gold,p.navy][i]});THEME.apply(thVal());break}
+  case "threset":{const p=THEME.PRESETS[0];run(async()=>{const s={...A.data.settings};delete s.theme;await API.settings.set(s);THEME.apply(null,true)},"رجعت الألوان الافتراضية.");break}
   case "evdel":run(()=>API.events.remove(id),"حُذفت الفعالية.");break;
   case "subdel":run(()=>API.subscribers.remove(id),"حُذف المشترك.");break;
  }
@@ -168,6 +178,7 @@ document.addEventListener("change",e=>{const el=e.target;
  if(el.id==="f_status"){A.f.status=el.value;render()}else if(el.id==="f_type"){A.f.type=el.value;render()}else if(el.id==="f_role"){A.f.role=el.value;render()}
  else if(el.dataset.role){const id=el.dataset.role,role=el.value;if(role==="engineer"){render();toast("اعتماد المهندسين يتم من بوابة المهندسين ← الإدارة ← طلبات الانضمام، بعد أن يقدّم المهندس طلبه هناك.",true);return}run(()=>API.users.setRole(id,role),"تم تغيير الدور.")}
 });
+document.addEventListener("input",e=>{if(/^th_[agn]$/.test(e.target.id||""))THEME.apply(thVal())});
 let qt=null;document.addEventListener("input",e=>{if(e.target.id==="f_q"){clearTimeout(qt);qt=setTimeout(()=>{A.f.q=e.target.value.trim();render()},250)}});
 
 /* ---------- boot ---------- */

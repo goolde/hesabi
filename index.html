@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="منصة المحاسب الشامل من أمان الحديثة لتقنية نظم المعلومات: الإصدارات، أكاديمية المحاسبة، النماذج، الوظائف، وبوابة الطلبات.">
-<link rel="icon" href="logos/aman.png">
+<link rel="icon" href="logos/shamel.png">
+<script src="assets/theme.js"></script>
 <title>منصة المحاسب الشامل | أمان الحديثة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -345,7 +346,7 @@ nav.main a.on{background:rgba(255,255,255,.14);color:#fff}
 .btn{border-radius:10px}
 
 /* hero v5 */
-.hero5{position:relative;overflow:hidden;border-radius:22px;background:radial-gradient(1200px 400px at 100% 0,rgba(51,181,229,.35),transparent 60%),linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#1B5C93 100%);color:#fff;padding:44px 40px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;align-items:center;margin-top:20px}
+.hero5{position:relative;overflow:hidden;border-radius:22px;background:radial-gradient(1200px 400px at 100% 0,color-mix(in srgb,var(--accent) 40%,transparent),transparent 60%),linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,var(--accent) 100%);color:#fff;padding:44px 40px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;align-items:center;margin-top:20px}
 .hero5::after{content:"";position:absolute;inset:auto -60px -60px auto;width:260px;height:260px;border-radius:50%;border:40px solid rgba(255,255,255,.05)}
 .hero5 h1{font-size:clamp(28px,4.2vw,44px);color:#fff}
 .hero5 p{color:#C9DAEB;font-size:17px;margin:12px 0 22px}
@@ -478,7 +479,7 @@ nav.main a{white-space:nowrap;padding-inline:10px}
 .bar5{display:grid;grid-template-columns:minmax(80px,38%) 1fr auto;gap:10px;align-items:center;font-size:13px;color:var(--ink)}
 .bar5>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar5 .tr{height:10px;background:var(--line);border-radius:6px;overflow:hidden;display:block}
-.bar5 .fl{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#3b82c4);border-radius:6px}
+.bar5 .fl{display:block;height:100%;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#fff));border-radius:6px}
 .bar5 .v{font-weight:700;min-width:22px;text-align:left}
 .filters5 select,.filters5 input{width:auto;flex:0 1 220px;min-width:0}
 .filters5 input{flex:1 1 220px}
@@ -529,12 +530,20 @@ table.adm select,table.adm input{max-width:100%}
 .ce-blk .prev{margin-top:8px;max-width:420px}
 .ce-help{font-size:13px;color:var(--muted)}
 .ce-prev{border:2px dashed var(--line,#ddd);border-radius:12px;padding:14px;margin-top:12px}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.shot{display:block;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);color:inherit;text-decoration:none}
+.shot img{display:block;width:100%;aspect-ratio:1366/768;object-fit:cover;object-position:top}
+.shot span{display:block;padding:6px 9px;font-size:13px;line-height:1.5}
+.shot:hover{border-color:var(--accent)}
+.brand{gap:8px}.brand .brand-logo+.brand-logo{margin-inline-start:-2px}
+@media (max-width:520px){.brand .brand-logo+.brand-logo{display:none}}
+.pcard .band img[src$="shamel.png"],.phead img[src$="shamel.png"]{background:#fff;border-radius:12px;padding:6px 10px}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#home"><img class="brand-logo" src="logos/aman.png" alt="أمان الحديثة"><span><b>أكاديمية المحاسب الشامل</b><small>أمان الحديثة لتقنية نظم المعلومات</small></span></a>
+    <a class="brand" href="#home"><img class="brand-logo" src="logos/shamel.png" alt="المحاسب الشامل"><img class="brand-logo" src="logos/aman.png" alt="أمان الحديثة"><span><b>أكاديمية المحاسب الشامل</b><small>أمان الحديثة لتقنية نظم المعلومات</small></span></a>
     <nav class="main" id="nav">
       <a href="#home" data-r="home">الرئيسية</a>
       <a href="#products" data-r="products">الإصدارات</a>
@@ -2127,8 +2136,8 @@ const LIC_IC={main:IC5.server,local:IC5.lan,online:IC5.cloud,pos:IC5.pos,rest:IC
 
 /* ---------- products ---------- */
 const PRODUCTS=[
- {id:"shamel",fam:"desktop",name:"المحاسب الشامل",mono:"الشامل",c1:"#7A2350",c2:"#3E1230",col:0,tag:"ديسكتوب",tagline:"نظام ERP مكتبي متكامل للمنشآت الصغيرة والمتوسطة، يعمل دون إنترنت.",hi:["يعمل بدون إنترنت","إدارة فروع متعددة","نقاط بيع ونقطة بيع مطاعم","سجل تدقيق كامل"]},
- {id:"plus",fam:"desktop",name:"المحاسب الشامل بلس",mono:"الشامل بلس",c1:"#4E2A6B",c2:"#24123A",col:1,tag:"ديسكتوب متقدم",tagline:"للشركات متعددة الفروع والمستودعات، مع تحكم مركزي ولوحة مؤشرات.",hi:["تحكم مركزي كامل بالفروع","تسعير حسب العميل","إدارة مخزون متقدمة","مناسب للشركات الكبيرة"]},
+ {id:"shamel",fam:"desktop",name:"المحاسب الشامل",mono:"الشامل",logo:"shamel",c1:"#7A2350",c2:"#3E1230",col:0,tag:"ديسكتوب",tagline:"نظام ERP مكتبي متكامل للمنشآت الصغيرة والمتوسطة، يعمل دون إنترنت.",hi:["يعمل بدون إنترنت","إدارة فروع متعددة","نقاط بيع ونقطة بيع مطاعم","سجل تدقيق كامل"]},
+ {id:"plus",fam:"desktop",name:"المحاسب الشامل بلس",mono:"الشامل بلس",logo:"shamel",c1:"#4E2A6B",c2:"#24123A",col:1,tag:"ديسكتوب متقدم",tagline:"للشركات متعددة الفروع والمستودعات، مع تحكم مركزي ولوحة مؤشرات.",hi:["تحكم مركزي كامل بالفروع","تسعير حسب العميل","إدارة مخزون متقدمة","مناسب للشركات الكبيرة"]},
  {id:"oltex",fam:"desktop",name:"أولتكس",logo:"oltex",c1:"#164E7E",c2:"#0B2540",col:2,tag:"ديسكتوب اقتصادي",pdf:"oltex",tagline:"نظام اقتصادي للأنشطة ذات الفرع الواحد، على Oracle Database 19c.",hi:["يعمل بدون إنترنت","احتساب هامش الربح تلقائياً","تقارير لحظية","دعم عملات وضرائب متعددة"]},
  {id:"shweb",fam:"web",name:"الشامل ويب",logo:"shweb",c1:"#2A7DB8",c2:"#123A63",col:3,tag:"سحابي",pdf:"shweb",tagline:"النسخة السحابية من الشامل لإدارة الفروع المتعددة من أي مكان، وتُعرف أيضاً باسم «المحاسب الشامل السحابي (كلاود)»: منتج واحد.",hi:["نظام سحابي 100%","تسعير ذكي حسب العميل والمورد والفرع","تعديل سعر البيع من فاتورة الشراء","نقاط بيع تعمل دون إنترنت"]},
  {id:"trust",fam:"web",name:"تروست المحاسبي",logo:"trust",c1:"#0E4D6B",c2:"#071F33",col:4,tag:"سحابي",pdf:"trust",tagline:"نظام محاسبي سحابي للمنشآت والمخازن الصغيرة ومتناهية الصغر.",hi:["نظام سحابي","لوحة مؤشرات تنفيذية","سجل تدقيق كامل","مناسب للمحلات الصغيرة"]},
@@ -2500,6 +2509,7 @@ go();
 <script src="assets/supabase.js"></script>
 <script src="assets/api.js"></script>
 <script src="assets/content.js"></script>
+<script>window.SHAMEL_SCREENS=[{"menu": "ملف", "slug": "file", "items": [["01", "قائمة ملف"], ["02", "فتح"], ["03", "تعديل كلمة المرور"], ["04", "تعديل وتأكيد رقم الجوال"], ["05", "إستيراد البيانات"], ["06", "معلومات"], ["07", "تعليمات"], ["08", "الملفات"]]}, {"menu": "فواتير", "slug": "invoices", "items": [["01", "قائمة فواتير"], ["02", "مبيعات"], ["03", "تسليم مبيعات"], ["04", "مرتجع مبيعات"], ["05", "صرف مبالغ التبديل"], ["06", "صرف بضاعة"], ["07", "توريد بضاعة"], ["08", "طلبات العملاء"], ["09", "طلبات الشراء"], ["10", "طلب صرف بسعر التكلفه"], ["11", "عمولة المناديب"]]}, {"menu": "سندات", "slug": "vouchers", "items": [["01", "قائمة سندات"], ["02", "سند قبض"], ["03", "سند صرف"], ["04", "القيد الإفتتاحي"], ["05", "قيد يومية"], ["06", "سند قيد"], ["07", "طلب سند صرف"], ["08", "القيد الدوري"], ["09", "تقرير حركة السندات"]]}, {"menu": "العملاء", "slug": "customers", "items": [["01", "قائمة العملاء"], ["02", "بطاقة عميل"], ["03", "بطاقة عميل - تبويب بيانات العملاء"], ["04", "بطاقة عميل - تبويب بيانات اخري"], ["05", "مجموعة العملاء_الموردين"], ["06", "بطاقة خصم"], ["07", "النقاط"], ["08", "الخصم التجاري للمبيعات (إشعار دائن)"], ["09", "الخصم التجاري للمشتريات (إشعار مدين)"], ["10", "تقرير فواتير العملاء المستحقة"], ["11", "تقرير أرصدة العملاء"], ["12", "تقرير أرصدة العملاء بالعملات"], ["13", "تقرير حساب العملاء"], ["14", "تقرير حساب العملاء و أعمار الذمم"], ["15", "تقرير حساب العملاء بالعملات"], ["16", "تقرير حساب العملاء المتعدد"], ["17", "تقرير اعمار الذمم ( العملاء )"], ["18", "تقرير العملاء الأكثر حركة"]]}, {"menu": "الموردين", "slug": "suppliers", "items": [["01", "قائمة الموردين"], ["02", "بطاقة مورد"], ["03", "بطاقة مورد - تبويب بيانات الموردين"], ["04", "بطاقة مورد - تبويب بيانات اخري"], ["05", "الخصم التجاري للمشتريات (إشعار مدين)"], ["06", "طباعة فواتيرالموردين"], ["07", "تقرير فواتير الموردين المستحقة"], ["08", "تقرير أرصدة الموردين"], ["09", "تقرير أرصدة الموردين بالعملات"], ["10", "تقرير حساب الموردين"], ["11", "تقرير حساب الموردين و أعمار الذمم"], ["12", "تقرير حساب الموردين بالعملات"], ["13", "تقرير حساب الموردين المتعدد"], ["14", "تقرير اعمار الذمم ( الموردين )"], ["15", "تقرير الموردين الأكثر حركة"], ["16", "تقرير بيانات الموردين"], ["17", "تعديل بيانات الموردين"]]}, {"menu": "حسابات", "slug": "accounts", "items": [["01", "قائمة حسابات"], ["02", "بطاقة حساب"], ["03", "الدليل المحاسبي"], ["04", "الدليل المحاسبي - تبويب الدليل المحاسبي"], ["05", "الدليل المحاسبي - تبويب معلومات اخري"], ["06", "الدليل المحاسبي - تبويب العمليات"], ["07", "الحسابات الرئيسية"], ["08", "الحسابات الرئيسية - تبويب بيانات الحسابات"], ["09", "مراكز التكلفة"], ["10", "مراكز التكلفة - تبويب مراكز التكلفة"], ["11", "مراكز التكلفة - تبويب بيانات اخرى"], ["12", "بطاقة مجموعة الحسابات"], ["13", "الأرصدة الأفتتاحية"], ["14", "البنوك"], ["15", "الأصول الثابتة"], ["16", "بطائق الإئتمان"], ["17", "التأمينات"], ["18", "تقارير الاستاذ العام"], ["19", "تقارير الحسابات التحليلية"], ["20", "تقرير دفتر اليومية"], ["21", "تقرير التدفق النقدي"], ["22", "تقرير اعمار الذمم"], ["23", "تقرير حركة الحسابات"], ["24", "تقرير الحسابات التي تجاوزت الحد"], ["25", "تقارير مراكز التكلفة"], ["26", "تقرير الأرصدة الإفتتاحية"], ["27", "بيانات الحسابات و الأصول"]]}, {"menu": "الأصناف", "slug": "items", "items": [["01", "قائمة الأصناف"], ["02", "بطاقة صنف"], ["03", "مجموعة الأصناف"], ["04", "مجموعة الأصناف - تبويب مجموعة الأصناف"], ["05", "مجموعة الأصناف - تبويب مخازن المجموعة"], ["06", "مجموعات الأصناف الأخري"], ["07", "بطاقة مخزن"], ["08", "الأصناف البديلة"]]}, {"menu": "نقاط البيع", "slug": "pos", "items": [["01", "قائمة نقاط البيع"], ["02", "إعتماد حركة نقطة البيع"], ["03", "إعتماد حركة نقاط البيع (الكل)"], ["04", "إلغاء إعتماد حركة نقاط البيع"], ["05", "بطاقة نقطة بيع"], ["06", "ارسال تحديثات نقاط البيع الي ملف"], ["07", "جلب ترحيلات نقاط البيع من ملف"], ["08", "تقرير حركة المبيعات ( نقاط البيع )"], ["09", "تقرير حركة السندات ( نقاط البيع )"], ["10", "أرصدة مراكز التكلفة ( نقاط البيع )"], ["11", "تقرير بيانات الترحيلات"], ["12", "فواتير نقاط البيع المعتمدة"], ["13", "متابعة ورقابة نقاط البيع"]]}, {"menu": "إدارة", "slug": "admin", "items": [["01", "قائمة إدارة"], ["02", "إعدادات النظام"], ["03", "تحديد الحسابات الأساسية"], ["04", "تحديد الحسابات الأساسية - تبويب عـــــــام"], ["05", "تحديد الحسابات الأساسية - تبويب المشتريات والتوريد"], ["06", "تحديد الحسابات الأساسية - تبويب المبيعات والصرف"], ["07", "تحديد الحسابات الأساسية - تبويب حسابات اخري"], ["08", "بطاقة فرع"], ["09", "مجموعات المستخدمين"], ["10", "مجموعات حسابات المستخدمين"], ["11", "المخازن المستخدمين"], ["12", "الفروع للمستخدمين"], ["13", "بطائق إئتمان المستخدمين"], ["14", "مراكز التكلفة للمستخدمين"], ["15", "المناديب للمستخدمين"], ["16", "تقرير الفواتير الغير مسلمة"], ["17", "تقرير الشيكات والحوالات الغير محصلة"], ["18", "المستندات الغير محفوظه"]]}, {"menu": "التقارير التجميعية", "slug": "consolidated", "items": [["01", "قائمة التقارير التجميعية"], ["02", "ميزان المراجعة تجميعي"], ["03", "الاستاذ العام تجميعي"], ["04", "أرصدة الحسابات تجميعي"], ["05", "أرصدة العملاء تجميعي"], ["06", "أرصدة الموردين تجميعي"], ["07", "أرصدة الحسابات للملفات"], ["08", "تقرير حركة صنف تفصيلية"]]}, {"menu": "الموارد البشرية", "slug": "hr", "items": [["01", "قائمة الموارد البشرية"], ["02", "الرئيسية"], ["03", "بطاقة الموظف"], ["04", "الإستحقاقات و الإستقطاعات"], ["05", "خصميات الموظفين"], ["06", "مكافآت الموظفين"], ["07", "وثائق الشركة"], ["08", "التأمين الصحي"], ["09", "ترقيات الموظفين"], ["10", "زيادة الراتب"], ["11", "المهام والاجراءات"], ["12", "التنبيهات"], ["13", "إنتاجية الموظفين"], ["14", "المهام أوالأعذار"], ["15", "الإضافي"], ["16", "الإجازات"], ["17", "سلف الموظفين"], ["18", "احتساب الإجازات السنوية"], ["19", "احتساب مكافأة نهاية الخدمه"], ["20", "مخالصة الاستحقاقات"], ["21", "مخالصة الاستحقاقات - تبويب شهادة الراتب"], ["22", "مخالصة الاستحقاقات - تبويب استحقاق الإجازة السنوية"], ["23", "مخالصة الاستحقاقات - تبويب إقرار تصفية الحقوق"], ["24", "الحضور والانصراف"], ["25", "تجهيز الأنظمة المفتوحة"], ["26", "تجهيز الراتب"], ["27", "تجهيز راتب موظف"], ["28", "صرف الرواتب"], ["29", "إعدادات الشهرالحالي"], ["30", "إغلاق الشهر الحالي"], ["31", "إغلاق الشهر الحالي - تبويب إغلاق شهر"], ["32", "إغلاق الشهر الحالي - تبويب إعادة فتح شهر"], ["33", "إعدادات الموارد البشرية"], ["34", "إعدادات الموارد البشرية - تبويب الضريبة"], ["35", "إعدادات الموارد البشرية - تبويب التأمين"], ["36", "أدوات"], ["37", "التقارير"], ["38", "أخري"]]}, {"menu": "التصنيع", "slug": "mfg", "items": [["01", "قائمة التصنيع"], ["02", "نماذج التصنيع"], ["03", "عمليات التصنيع"], ["04", "عمليات التصنيع - تبويب المواد المنتجة"], ["05", "عمليات التصنيع - تبويب المواد الاولية"], ["06", "عمليات التصنيع - تبويب مصروفات"], ["07", "عرض عمليات التصنيع"], ["08", "تسليم عمليات التصنيع"], ["09", "خط الانتاج"], ["10", "مكونات الأصناف"], ["11", "الخصائص"], ["12", "الصلاحيات"], ["13", "المصطلحات"], ["14", "تقرير طلبات العملاء"], ["15", "تقارير حركة و فوارق الأصناف"]]}, {"menu": "المطاعم", "slug": "restaurants", "items": [["01", "قائمة المطاعم"], ["02", "طلب جديد"], ["03", "شاشة المطابخ"], ["04", "بطاقة مطعم"], ["05", "بطاقة قسم"], ["06", "بطاقة طاولة"], ["07", "بطاقة مطبخ"], ["08", "بطاقة سائق"], ["09", "وجبات الموظفين"], ["10", "صفات الأصناف"]]}, {"menu": "الشقق", "slug": "apartments", "items": [["01", "قائمة الشقق"], ["02", "الرئيسية"], ["03", "التأجير"], ["04", "التأجير - تبويب الشقق"], ["05", "التأجير - تبويب بيانات اضافية"], ["06", "التأجير - تبويب المرافقين"], ["07", "الحجز"], ["08", "بطاقة شقة"], ["09", "تصنيف الشقق"], ["10", "الموسم"], ["11", "التسعير"], ["12", "المرافقين"]]}, {"menu": "صيانة النظام", "slug": "maintenance", "items": [["01", "قائمة صيانة النظام"], ["02", "فوارق الجرد وحساب المخزون"], ["03", "فوارق الجرد وحساب المخزون - تبويب معالجة"], ["04", "فوارق الجرد وحساب المخزون - تبويب عام"], ["05", "فوارق الجرد وحساب المخزون - تبويب المخزون والحسابات"], ["06", "فوارق الجرد وحساب المخزون - تبويب اصناف تحتاج اعادة احتساب التكلفة"], ["07", "فوارق الجرد وحساب المخزون - تبويب فواتير ليست في المخزون"], ["08", "فوارق الجرد وحساب المخزون - تبويب القيد المحاسبي"], ["09", "فوارق الجرد وحساب المخزون - تبويب الأصناف"], ["10", "الفواتير التي لم تؤثر علي المخزون"], ["11", "إعادة احتساب تكلفة الأصناف بسعر"], ["12", "إعادة إحتساب تكلفة الفواتير"], ["13", "إعادة إحتساب تكلفة مرتجع المبيعات يدويا"], ["14", "إعادة إحتساب تكلفة التحويل المخزني يدويا"], ["15", "إعادة احتساب التكلفة في بطاقة الصنف"], ["16", "ضبط تكاليف الفواتير مثل التقارير"], ["17", "تعديل المستندات"], ["18", "تعديل المستندات - تبويب الفواتير"], ["19", "تعديل المستندات - تبويب القيد المحاسبي"], ["20", "تعديل المستندات - تبويب الأصناف"], ["21", "المستندات المحذوفة والمعدلة"], ["22", "صيانة قاعدة البيانات"], ["23", "تسريع قاعدة البيانات"], ["24", "الكميات السالبة"], ["25", "ترحيل الفواتير الغير مرحلة الي المخزون"], ["26", "ملفات الكلاود"], ["27", "تعديل التواريخ الهجرية المدخلة"], ["28", "العمليات المعلقة"], ["29", "الفواتير المفقودة"], ["30", "watter"], ["31", "إدارة و إيقاف الطرفيات البعيدة"], ["32", "إعدادات قاعدة البيانات"], ["33", "تنفيذ استعلام"]]}, {"menu": "ادوات", "slug": "tools", "items": [["01", "قائمة ادوات"], ["02", "تصميم طباعة المستندات"], ["03", "خصائص المستندات"], ["04", "اللغة"], ["05", "الة حاسبة"], ["06", "الشامل لايت (أجهزة الجوال)"], ["08", "اعدادات Wateer"]]}, {"menu": "نوافذ", "slug": "windows", "items": [["01", "قائمة نوافذ"], ["02", "نافذة المعلومات"], ["03", "نافذة الصورة"], ["04", "نافذة أصناف العملاء"], ["05", "إغلاق جميع النوافذ"], ["06", "شريط الأدوات"], ["07", "التقارير الرسومية"], ["08", "الإختصارات الجانبية"], ["09", "إدارة الإشعارات"], ["10", "لون الخلفية"]]}, {"menu": "تواصل", "slug": "contact", "items": [["01", "قائمة تواصل"], ["02", "AnyDesk"], ["03", "Supremo"], ["04", "TeamViewer"], ["05", "UltraViewer"], ["06", "youtube"], ["07", "تقييم"], ["08", "خدمة الدعم الفني"], ["09", "تفاصيل"]]}];</script>
 <script>
 /* =====================================================================
    موقع الطلاب والعملاء: حسابات حقيقية عبر طبقة API (assets/api.js)
@@ -2516,7 +2526,7 @@ let _loading=null;
 async function loadData(){
  if(!API.ready){LIVE.err="none";return}
  const pub=Promise.all([API.jobs.list(),API.ads.active(),API.events.list(),API.settings.get(),API.offices.list(),API.qa.list()])
-  .then(([jobs,ads,events,settings,offices,qa])=>{L5.jobs=jobs;L5.ads=ads;L5.events=events.map(e=>({id:e.id,t:e.t,org:e.org,date:e.date,where:[e.city,e.place].filter(Boolean).join(" · "),reg:e.d,link:e.url}));L5.settings=settings||{};LIVE.offices=offices;LIVE.qa=qa});
+  .then(([jobs,ads,events,settings,offices,qa])=>{L5.jobs=jobs;L5.ads=ads;L5.events=events.map(e=>({id:e.id,t:e.t,org:e.org,date:e.date,where:[e.city,e.place].filter(Boolean).join(" · "),reg:e.d,link:e.url}));L5.settings=settings||{};if(window.THEME)THEME.apply(L5.settings.theme||null,true);LIVE.offices=offices;LIVE.qa=qa});
  const mine=ME6.uid?Promise.all([API.requests.mine(),API.alerts.mine(),API.notifications.list(),API.offices.mine()])
   .then(([reqs,alert,notes,office])=>{L5.myReq={items:reqs};L5.myAlert=alert;L5.notes=notes;LIVE.myReq=office&&office.status==="pending"?office:null}):Promise.resolve();
  const cont=API.content.all().then(c=>{CONTENT=c||{}}).catch(e=>console.warn(e));
@@ -2534,13 +2544,18 @@ vLesson=function(id,i){const c=C(id),l=c&&c.lessons[i],ct=CONTENT["lesson:"+id+"
  l.body=(rep?"":o)+`<section class="cb">${rep?"":`<h3 class="cb-h">شرح إضافي وفيديوهات</h3>`}${CB.render(ct.blocks)}</section>`;
  try{return _vLesson6(id,i)}finally{l.body=o}};
 const _vProduct6=vProduct;
-vProduct=function(id){const ct=CONTENT["product:"+id];let h=_vProduct6(id);
- if(!ct||!ct.blocks.length)return h;
- const sel=ptab[id]==="vid",i=h.lastIndexOf('<nav class="tabs5">');if(i<0)return h;
+function screensHTML(){const S=window.SHAMEL_SCREENS||[];
+ return `<p class="fine">لقطات من شاشات المحاسب الشامل الفعلية (نسخة تجريبية، الإصدار 10.0.7). اضغط على أي صورة لفتحها بالحجم الكامل.</p>${S.map((m,k)=>`<details class="acc5" ${k===0?"open":""}><summary>${esc(m.menu)}<span class="cnt">${m.items.length} شاشة</span></summary><div class="in"><div class="shots">${m.items.map(([n,t])=>{const u="screens/shamel/"+m.slug+"/"+n+".jpg";return `<a class="shot" href="${u}" target="_blank" rel="noopener"><img src="${u}" alt="${esc(t)}" loading="lazy"><span>${esc(t)}</span></a>`}).join("")}</div></div></details>`).join("")}`}
+vProduct=function(id){let h=_vProduct6(id);
+ const ct=CONTENT["product:"+id],extra=[];
+ if(ct&&ct.blocks.length){const nv=ct.blocks.filter(b=>b.type==="video").length;extra.push(["vid",`الفيديوهات والشرح${nv?` <span class="cnt">${nv}</span>`:""}`,()=>`<div class="panel cb">${CB.render(ct.blocks)}</div>`])}
+ if(id==="shamel"&&(window.SHAMEL_SCREENS||[]).length)extra.push(["screens","شاشات النظام",screensHTML]);
+ if(!extra.length)return h;
+ const i=h.lastIndexOf('<nav class="tabs5">');if(i<0)return h;
+ const sel=extra.find(x=>x[0]===ptab[id]);
  const j=h.indexOf("</nav>",i);let nav=h.slice(i,j);if(sel)nav=nav.replace(/ class="on"/g,' class=""');
- const nv=ct.blocks.filter(b=>b.type==="video").length;
- nav+=`<button data-ptab="${id}:vid" class="${sel?"on":""}">الفيديوهات والشرح${nv?` <span class="cnt">${nv}</span>`:""}</button>`;
- let rest=h.slice(j);if(sel){const k=rest.indexOf('<div class="tabpane">');rest=rest.slice(0,k)+`<div class="tabpane"><div class="panel cb">${CB.render(ct.blocks)}</div></div>`}
+ nav+=extra.map(([k,l])=>`<button data-ptab="${id}:${k}" class="${sel&&sel[0]===k?"on":""}">${l}</button>`).join("");
+ let rest=h.slice(j);if(sel){const k=rest.indexOf('<div class="tabpane">');rest=rest.slice(0,k)+`<div class="tabpane">${sel[2]()}</div>`}
  return h.slice(0,i)+nav+rest};
 document.addEventListener("click",e=>{const a=e.target.closest("[data-vtab]");if(a)ptab[a.dataset.vtab]="vid"},true);
 function vVideos(){
